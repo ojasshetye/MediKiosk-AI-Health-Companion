@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediKiosk — Healthcare Portal</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f4c81, #1e72d4, #0d9aa6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      background: white;
+      border-radius: 20px;
+      padding: 45px 30px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    }
+
+    h1 {
+      color: #0f4c81;
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #5a7494;
+      margin-bottom: 35px;
+      font-size: 16px;
+    }
+
+    .portals {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .portal {
+      display: block;
+      text-decoration: none;
+      padding: 28px 20px;
+      border-radius: 15px;
+      border: 1px solid #dce6f0;
+      background: #f7faff;
+      transition: 0.2s;
+    }
+
+    .portal:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(15,76,129,0.12);
+    }
+
+    .portal h2 {
+      color: #0f4c81;
+      margin-bottom: 8px;
+    }
+
+    .portal p {
+      color: #5a7494;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .portals {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>MediKiosk</h1>
+
+    <p class="subtitle">
+      AI-Powered Healthcare & Patient History Platform
+    </p>
+
+    <div class="portals">
+
+      <a class="portal" href="./frontend/patient/">
+        <h2>Patient Portal</h2>
+        <p>Login using ABHA ID and password</p>
+      </a>
+
+      <a class="portal" href="./frontend/doctor/">
+        <h2>Doctor Portal</h2>
+        <p>Login using Doctor ID and password</p>
+      </a>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
