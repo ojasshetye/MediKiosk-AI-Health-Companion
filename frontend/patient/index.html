@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediKiosk — AI-Powered Patient History Taking | SIH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Azeret+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'Azeret Mono', 'SF Mono', Consolas, monospace;
+  --bg: #f4f8fc; --surface: #ffffff; --surface-2: #eef4fb;
+  --border: rgba(15,76,129,0.10); --border-bright: rgba(15,76,129,0.20);
+  --text: #0f2c4a; --text-dim: #5a7494; --text-bright: #08203a;
+  --accent: #1e72d4; --accent-deep: #0f4c81; --accent-soft: #d9e8f8; --accent-dim: rgba(30,114,212,0.10);
+  --teal: #0d9aa6; --teal-dim: rgba(13,154,166,0.10);
+  --green: #1a9e5a; --green-dim: rgba(26,158,90,0.10);
+  --amber: #d98a00; --amber-dim: rgba(217,138,0,0.10);
+  --rose: #d4456f; --rose-dim: rgba(212,69,111,0.10);
+  --red: #e53935; --red-dim: rgba(229,57,53,0.08);
+  --shadow-sm: 0 1px 3px rgba(15,76,129,0.06), 0 1px 2px rgba(15,76,129,0.04);
+  --shadow-md: 0 4px 16px rgba(15,76,129,0.08), 0 1px 3px rgba(15,76,129,0.04);
+  --shadow-lg: 0 12px 40px rgba(15,76,129,0.10), 0 2px 8px rgba(15,76,129,0.04);
+  --radius: 14px; --radius-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--bg); background-image: radial-gradient(ellipse 80% 50% at 50% -5%, rgba(30,114,212,0.12) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 85% 15%, rgba(13,154,166,0.08) 0%, transparent 60%); background-attachment: fixed; color: var(--text); line-height: 1.6; overflow-wrap: break-word; -webkit-font-smoothing: antialiased; }
+
+#mainContent { display: none; }
+body.app-active #authSection { display: none; }
+body.app-active #mainContent { display: block; }
+
+/* AUTH */
+#authSection { min-height: 100vh; display: flex; align-items: stretch; justify-content: center; }
+.auth-wrap { display: grid; grid-template-columns: 1fr 1fr; max-width: 920px; width: 100%; min-height: 100vh; }
+@media (max-width: 768px) { #authSection { padding: 20px; align-items: center; } .auth-wrap { grid-template-columns: 1fr; min-height: auto; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-lg); } }
+.auth-brand { background: linear-gradient(155deg, var(--accent-deep) 0%, var(--accent) 55%, var(--teal) 100%); padding: 48px 44px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.auth-brand::before { content:''; position:absolute; top:-30%; right:-20%; width:350px; height:350px; border-radius:50%; background:rgba(255,255,255,0.06); }
+.auth-brand::after { content:''; position:absolute; bottom:-20%; left:-10%; width:280px; height:280px; border-radius:50%; background:rgba(13,154,166,0.20); }
+.auth-brand > * { position: relative; z-index: 1; }
+.auth-brand__logo { display: flex; align-items: center; gap: 12px; }
+.auth-brand__logo .logo-mark { width: 48px; height: 48px; border-radius: 13px; background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2); }
+.auth-brand__logo .logo-mark svg { width: 26px; height: 26px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.auth-brand__logo span { color: white; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.auth-brand__hero { margin: auto 0; }
+.auth-brand__hero h2 { color: white; font-size: 30px; font-weight: 800; line-height: 1.2; letter-spacing: -1px; margin-bottom: 14px; }
+.auth-brand__hero p { color: rgba(255,255,255,0.88); font-size: 15px; line-height: 1.6; max-width: 320px; margin-bottom: 32px; }
+.auth-brand__features { list-style: none; padding: 0; }
+.auth-brand__features li { color: rgba(255,255,255,0.92); font-size: 14px; padding: 10px 0 10px 30px; position: relative; line-height: 1.5; }
+.auth-brand__features li::before { content:''; position:absolute; left:0; top:13px; width:18px; height:18px; border-radius:50%; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); }
+.auth-brand__features li::after { content:'\2713'; position:absolute; left:4px; top:10px; color:white; font-size:11px; font-weight:700; }
+.auth-brand__tag { margin-top: 32px; font-family: var(--font-mono); font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1.5px; }
+@media (max-width: 768px) { .auth-brand { padding: 32px 32px 28px; } .auth-brand__hero { margin: 24px 0; } .auth-brand__hero h2 { font-size: 24px; } .auth-brand__hero p { font-size: 14px; margin-bottom: 20px; } .auth-brand__features li { font-size: 13px; } }
+.auth-form-side { background: var(--surface); padding: 48px 44px; display: flex; flex-direction: column; justify-content: center; }
+@media (max-width: 768px) { .auth-form-side { padding: 32px; } }
+.auth-tabs { display: flex; gap: 0; background: var(--surface-2); border-radius: 12px; padding: 4px; margin-bottom: 28px; }
+.auth-tab { flex: 1; padding: 11px 20px; text-align: center; font-size: 14px; font-weight: 600; color: var(--text-dim); border-radius: 9px; cursor: pointer; transition: all 0.2s ease; border: none; background: none; font-family: var(--font-body); }
+.auth-tab.active { background: white; color: var(--accent-deep); box-shadow: var(--shadow-sm); }
+.auth-form-group { margin-bottom: 18px; }
+.auth-form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-bright); margin-bottom: 7px; }
+.auth-form-group label .req { color: var(--rose); }
+.form-input { width: 100%; padding: 13px 16px; border: 1px solid var(--border-bright); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 15px; background: var(--surface-2); color: var(--text); outline: none; transition: all 0.2s ease; }
+.form-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px var(--accent-dim); }
+.form-input::placeholder { color: var(--text-dim); opacity: 0.6; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+.auth-error, .auth-success { border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: none; }
+.auth-error { background: var(--rose-dim); color: var(--rose); }
+.auth-success { background: var(--green-dim); color: var(--green); }
+.auth-error.show, .auth-success.show { display: block; animation: fadeUp 0.3s ease; }
+.auth-form { display: none; animation: fadeUp 0.3s ease; }
+.auth-form.active { display: block; }
+.btn-auth { width: 100%; background: var(--accent); color: white; font-family: var(--font-body); font-size: 16px; font-weight: 700; padding: 14px; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(30,114,212,0.30); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
+.btn-auth:hover { background: var(--accent-deep); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,114,212,0.35); }
+.btn-auth:active { transform: translateY(0); }
+.btn-auth--signup { background: var(--teal); box-shadow: 0 4px 14px rgba(13,154,166,0.30); }
+.btn-auth--signup:hover { background: #078080; box-shadow: 0 6px 20px rgba(13,154,166,0.35); }
+.auth-switch { text-align: center; font-size: 13px; color: var(--text-dim); }
+.auth-switch a { color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer; }
+.auth-switch a:hover { text-decoration: underline; }
+
+/* NAVBAR */
+.navbar { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 14px 0; }
+.nav-inner { max-width: 1180px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--accent-deep); letter-spacing: -0.5px; text-decoration: none; }
+.logo-mark { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--teal)); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(30,114,212,0.30); }
+.logo-mark svg { width: 22px; height: 22px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.nav-links { display: flex; gap: 6px; align-items: center; }
+.nav-links a { text-decoration: none; color: var(--text-dim); font-size: 14px; font-weight: 500; padding: 8px 12px; border-radius: 8px; transition: all 0.2s ease; }
+.nav-links a:hover { color: var(--accent-deep); background: var(--accent-dim); }
+.nav-links a.nav-active { color: var(--accent); background: var(--accent-dim); font-weight: 600; }
+.nav-user { display: flex; align-items: center; gap: 10px; }
+.nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--teal)); color: white; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.nav-user-name { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+.nav-logout { background: var(--surface-2); border: 1px solid var(--border-bright); color: var(--text-dim); font-size: 13px; font-weight: 600; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+.nav-logout:hover { background: var(--rose-dim); color: var(--rose); border-color: var(--rose); }
+@media (max-width: 900px) { .nav-links a { display: none; } .nav-user-name { display: none; } }
+
+/* MODE SWITCHER */
+.mode-switch { display: flex; gap: 0; background: var(--surface-2); border-radius: 12px; padding: 4px; margin-bottom: 32px; max-width: 420px; }
+.mode-btn { flex: 1; padding: 12px 20px; text-align: center; font-size: 14px; font-weight: 600; color: var(--text-dim); border-radius: 9px; cursor: pointer; transition: all 0.2s ease; border: none; background: none; font-family: var(--font-body); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.mode-btn.active { background: white; color: var(--accent-deep); box-shadow: var(--shadow-sm); }
+.mode-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.mode-panel { display: none; }
+.mode-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+/* LAYOUT */
+.container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+section { padding: 56px 0; scroll-margin-top: 80px; }
+.section-label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.section-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.section-title { font-size: clamp(26px, 3.5vw, 36px); font-weight: 800; color: var(--text-bright); letter-spacing: -1px; line-height: 1.15; margin-bottom: 12px; }
+.section-subtitle { font-size: 16px; color: var(--text-dim); max-width: 620px; margin-bottom: 36px; }
+
+/* HERO */
+.hero { padding: 60px 0 40px; }
+.hero-grid { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; gap: 32px; } }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--accent-soft); color: var(--accent-deep); font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(30,114,212,0.15); }
+.hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(26,158,90,0.20); }
+.hero h1 { font-size: clamp(32px, 5vw, 50px); font-weight: 800; line-height: 1.08; letter-spacing: -1.5px; color: var(--text-bright); margin-bottom: 18px; }
+.hero h1 .grad { background: linear-gradient(120deg, var(--accent), var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p.lead { font-size: 17px; line-height: 1.65; color: var(--text-dim); max-width: 520px; margin-bottom: 24px; }
+.hero-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 15px; font-weight: 600; padding: 12px 24px; border-radius: 11px; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s ease; }
+.btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 14px rgba(30,114,212,0.30); }
+.btn-primary:hover { background: var(--accent-deep); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(30,114,212,0.35); }
+.btn-ghost { background: white; color: var(--accent-deep); border: 1px solid var(--border-bright); }
+.btn-ghost:hover { background: var(--surface-2); border-color: var(--accent); }
+.hero-lang-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.hero-lang-label { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+.hero-lang-select { padding: 10px 16px; border: 1px solid var(--border-bright); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 14px; font-weight: 500; background: white; color: var(--accent-deep); outline: none; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
+.hero-lang-select:hover { border-color: var(--accent); }
+.hero-lang-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.hero-ayush-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.hero-ayush-label { font-size: 14px; font-weight: 600; color: var(--text-bright); }
+.hero-ayush-toggle { position: relative; width: 44px; height: 24px; background: var(--border-bright); border-radius: 12px; cursor: pointer; transition: background 0.2s ease; }
+.hero-ayush-toggle.on { background: var(--teal); }
+.hero-ayush-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: white; transition: transform 0.2s ease; }
+.hero-ayush-toggle.on::after { transform: translateX(20px); }
+.hero-ayush-note { font-size: 13px; color: var(--teal); font-weight: 600; }
+.hero-stats { display: flex; gap: 28px; flex-wrap: wrap; }
+.hero-stat strong { display: block; font-size: 26px; font-weight: 800; color: var(--accent-deep); }
+.hero-stat span { font-size: 13px; color: var(--text-dim); }
+
+/* HERO VISUAL */
+.hero-visual { position: relative; }
+.kiosk-mockup { background: white; border-radius: 22px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; transform: perspective(1000px) rotateY(-4deg) rotateX(2deg); transition: transform 0.4s ease; }
+.kiosk-mockup:hover { transform: perspective(1000px) rotateY(0deg) rotateX(0deg); }
+.kiosk-header { background: linear-gradient(135deg, var(--accent-deep), var(--accent)); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.kiosk-header-title { color: white; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.kiosk-dots { display: flex; gap: 5px; }
+.kiosk-dots span { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,0.35); }
+.kiosk-dots span:first-child { background: rgba(255,255,255,0.7); }
+.kiosk-body { padding: 20px; }
+.kiosk-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; margin-bottom: 10px; font-size: 13px; }
+.kiosk-row:last-child { margin-bottom: 0; }
+.kiosk-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.kiosk-icon svg { width: 16px; height: 16px; stroke-width: 2.2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.kiosk-row strong { font-size: 13px; color: var(--text-bright); display: block; }
+.kiosk-row small { font-size: 11px; color: var(--text-dim); }
+
+/* PANELS */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.panel-grid { display: grid; grid-template-columns: 1fr 1fr; }
+@media (max-width: 768px) { .panel-grid { grid-template-columns: 1fr; } }
+.panel-left { padding: 28px; display: flex; flex-direction: column; }
+.panel-right { padding: 28px; border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--surface-2); }
+@media (max-width: 768px) { .panel-right { border-left: none; border-top: 1px solid var(--border); } }
+.panel-title { font-size: 18px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.panel-title svg { width: 20px; height: 20px; stroke-width: 2; fill: none; stroke: var(--accent); stroke-linecap: round; stroke-linejoin: round; }
+.panel-sub { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
+
+/* CHAT */
+.chat-lang { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--teal); background: var(--teal-dim); padding: 4px 10px; border-radius: 6px; margin-bottom: 16px; align-self: flex-start; }
+.chat-ayush-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-dim); padding: 4px 10px; border-radius: 6px; margin-bottom: 16px; margin-left: 8px; align-self: flex-start; }
+.chat-messages { flex: 1; display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; max-height: 300px; overflow-y: auto; }
+.msg { max-width: 85%; padding: 11px 15px; border-radius: 14px; font-size: 13.5px; line-height: 1.5; animation: msgIn 0.3s ease-out both; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.msg--ai { background: white; border: 1px solid var(--border); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg--ai::before { content: 'AI'; display: inline-block; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--accent); background: var(--accent-dim); padding: 1px 6px; border-radius: 4px; margin-right: 7px; vertical-align: middle; }
+.msg--user { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg--alert { background: var(--red-dim); border: 1px solid rgba(229,57,53,0.20); color: var(--red); align-self: flex-start; border-bottom-left-radius: 4px; font-weight: 500; }
+.msg--alert::before { content: 'ALERT'; background: var(--red); color: white; }
+.msg--saved { background: var(--green-dim); border: 1px solid rgba(26,158,90,0.20); color: var(--green); align-self: center; border-radius: 10px; font-size: 13px; font-weight: 600; text-align: center; max-width: 100%; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input { flex: 1; padding: 11px 14px; border: 1px solid var(--border-bright); border-radius: 10px; font-family: var(--font-body); font-size: 13.5px; background: white; color: var(--text); outline: none; transition: border-color 0.2s ease; }
+.chat-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.chat-send, .chat-mic { border: none; border-radius: 10px; padding: 0 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.chat-send { background: var(--accent); color: white; }
+.chat-send:hover { background: var(--accent-deep); }
+.chat-mic { background: var(--teal-dim); color: var(--teal); border: 1px solid var(--teal); }
+.chat-mic:hover { background: var(--teal); color: white; }
+.chat-mic.recording { background: var(--red); color: white; border-color: var(--red); animation: pulseMic 1.2s infinite; }
+@keyframes pulseMic { 0%,100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); } 50% { box-shadow: 0 0 0 8px rgba(229,57,53,0); } }
+.chat-send svg, .chat-mic svg { width: 17px; height: 17px; stroke-width: 2.2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.quick-words { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.quick-word { font-size: 12px; padding: 5px 11px; border-radius: 16px; background: white; border: 1px solid var(--border-bright); color: var(--accent-deep); cursor: pointer; transition: all 0.15s ease; }
+.quick-word:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.quick-word--alert { border-color: rgba(229,57,53,0.25); color: var(--red); }
+.quick-word--alert:hover { background: var(--red); color: white; border-color: var(--red); }
+
+/* SUMMARY BLOCKS */
+.summary-block { border-left: 3px solid var(--accent-soft); padding: 6px 0 6px 14px; margin-bottom: 12px; transition: border-color 0.2s ease; }
+.summary-block.filled { border-left-color: var(--accent); }
+.summary-block.alert-filled { border-left-color: var(--red); }
+.summary-block__label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 3px; }
+.summary-block__value { font-size: 13px; color: var(--text); line-height: 1.5; }
+.summary-block .placeholder { color: var(--text-dim); font-style: italic; opacity: 0.6; }
+.summary-actions { margin-top: auto; padding-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-sm { font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s ease; }
+.btn-sm-save { background: var(--green); color: white; }
+.btn-sm-save:hover { filter: brightness(1.1); }
+.btn-sm-edit { background: white; color: var(--text); border: 1px solid var(--border-bright); }
+.btn-sm-edit:hover { background: var(--accent-dim); border-color: var(--accent); }
+
+/* UPLOAD */
+.drop-zone { border: 2px dashed var(--border-bright); border-radius: var(--radius); padding: 36px 20px; text-align: center; transition: all 0.25s ease; cursor: pointer; background: var(--surface-2); }
+.drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-dim); }
+.drop-zone__icon { width: 52px; height: 52px; border-radius: 13px; background: var(--accent-soft); color: var(--accent); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.drop-zone__icon svg { width: 26px; height: 26px; stroke-width: 2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.drop-zone h4 { font-size: 15px; font-weight: 700; color: var(--text-bright); margin-bottom: 5px; }
+.drop-zone p { font-size: 13px; color: var(--text-dim); }
+.drop-zone .browse-link { color: var(--accent); font-weight: 600; text-decoration: underline; cursor: pointer; }
+.file-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.file-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: white; border-radius: var(--radius-sm); border: 1px solid var(--border); animation: fadeUp 0.3s ease; }
+.file-item__icon { width: 36px; height: 36px; border-radius: 9px; background: var(--teal-dim); color: var(--teal); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.file-item__icon svg { width: 18px; height: 18px; stroke-width: 2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.file-item__info { flex: 1; min-width: 0; }
+.file-item__name { font-size: 13px; font-weight: 600; color: var(--text-bright); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-item__size { font-size: 11px; color: var(--text-dim); }
+.file-item__remove { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
+.file-item__remove:hover { color: var(--rose); background: var(--rose-dim); }
+.file-item__remove svg { width: 16px; height: 16px; stroke-width: 2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.analyze-btn { width: 100%; margin-top: 16px; background: var(--teal); color: white; font-family: var(--font-body); font-size: 15px; font-weight: 700; padding: 14px; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(13,154,166,0.25); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.analyze-btn:hover { background: #078080; transform: translateY(-1px); }
+.analyze-btn:disabled { background: var(--text-dim); cursor: not-allowed; transform: none; box-shadow: none; }
+.analyze-btn svg { width: 18px; height: 18px; stroke-width: 2.2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+
+/* OCR RESULTS */
+.ocr-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 20px; color: var(--text-dim); }
+.ocr-empty__icon { width: 60px; height: 60px; border-radius: 15px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.ocr-empty__icon svg { width: 30px; height: 30px; stroke: var(--text-dim); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ocr-empty p { font-size: 14px; max-width: 240px; line-height: 1.5; }
+.ocr-loading { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px 20px; text-align: center; }
+.scan-anim { width: 72px; height: 72px; position: relative; margin-bottom: 18px; }
+.scan-anim__circle { width: 100%; height: 100%; border: 3px solid var(--surface-2); border-top-color: var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.ocr-loading p { font-size: 14px; color: var(--text-dim); }
+.ocr-steps { margin-top: 12px; font-size: 12px; color: var(--text-dim); font-family: var(--font-mono); text-align: left; }
+.ocr-steps div { padding: 3px 0; opacity: 0; animation: fadeIn 0.4s ease forwards; }
+.ocr-steps div:nth-child(1) { animation-delay: 0.3s; }
+.ocr-steps div:nth-child(2) { animation-delay: 0.9s; }
+.ocr-steps div:nth-child(3) { animation-delay: 1.5s; }
+.ocr-steps div.done { color: var(--green); }
+@keyframes fadeIn { to { opacity: 1; } }
+.extracted-item { background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; animation: fadeUp 0.3s ease; }
+.extracted-item__label { font-family: var(--font-mono); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--teal); margin-bottom: 4px; }
+.extracted-item__value { font-size: 13.5px; color: var(--text); line-height: 1.5; }
+
+/* RED FLAG */
+.redflag-banner { background: linear-gradient(135deg, var(--red), #c62828); border-radius: var(--radius); padding: 18px 22px; color: white; display: flex; align-items: center; gap: 16px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(229,57,53,0.25); animation: pulseAlert 2s ease-in-out infinite; }
+@keyframes pulseAlert { 0%,100% { box-shadow: 0 8px 24px rgba(229,57,53,0.25); } 50% { box-shadow: 0 8px 32px rgba(229,57,53,0.40); } }
+.redflag-banner__icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.redflag-banner__icon svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.redflag-banner__text strong { font-size: 15px; font-weight: 700; display: block; margin-bottom: 2px; }
+.redflag-banner__text span { font-size: 13px; opacity: 0.92; }
+.redflag-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--amber); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 10px; transition: all 0.2s ease; }
+.redflag-card--urgent { border-left-color: var(--red); background: var(--red-dim); }
+.redflag-card__header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.redflag-card__level { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; }
+.redflag-card__level--moderate { background: var(--amber-dim); color: var(--amber); }
+.redflag-card__level--urgent { background: var(--red); color: white; }
+.redflag-card__title { font-size: 14px; font-weight: 700; color: var(--text-bright); }
+.redflag-card__detail { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+/* DOCTOR PORTAL */
+.doc-search-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.doc-search-input { flex: 1; min-width: 200px; padding: 14px 18px; border: 1px solid var(--border-bright); border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 15px; background: white; color: var(--text); outline: none; transition: all 0.2s ease; }
+.doc-search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.doc-search-btn { background: var(--accent); color: white; font-family: var(--font-body); font-size: 15px; font-weight: 600; padding: 14px 24px; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(30,114,212,0.25); display: flex; align-items: center; gap: 8px; }
+.doc-search-btn:hover { background: var(--accent-deep); transform: translateY(-1px); }
+.doc-search-btn svg { width: 18px; height: 18px; stroke-width: 2.2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+
+.doc-patient-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow-md); overflow: hidden; }
+.doc-patient-header { background: linear-gradient(135deg, var(--accent-deep), var(--accent)); padding: 24px 28px; color: white; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.doc-patient-header h3 { font-size: 20px; font-weight: 700; }
+.doc-patient-header .doc-p-info { display: flex; align-items: center; gap: 12px; }
+.doc-patient-header .doc-p-avatar { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+.doc-patient-header .doc-p-meta { font-size: 12px; opacity: 0.85; font-family: var(--font-mono); }
+.doc-patient-body { padding: 28px; }
+.doc-section { margin-bottom: 20px; }
+.doc-section__label { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.doc-section__label::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.doc-section__label--red { color: var(--red); }
+.doc-section__label--red::before { background: var(--red); }
+.doc-section__label--green { color: var(--green); }
+.doc-section__label--green::before { background: var(--green); }
+.doc-section__label--amber { color: var(--amber); }
+.doc-section__label--amber::before { background: var(--amber); }
+.doc-section__content { font-size: 14px; color: var(--text); line-height: 1.6; padding-left: 14px; border-left: 2px solid var(--surface-2); }
+.doc-section__content ul { list-style: none; padding: 0; }
+.doc-section__content ul li { padding: 4px 0 4px 20px; position: relative; }
+.doc-section__content ul li::before { content: '\2022'; position: absolute; left: 4px; color: var(--accent); font-weight: 700; }
+.doc-tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 6px; margin: 2px; }
+.doc-tag--red { background: var(--red-dim); color: var(--red); }
+.doc-tag--blue { background: var(--accent-dim, #e0ecfb); color: var(--accent, #1e72d4); font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+.doc-tag--amber { background: var(--amber-dim); color: var(--amber); }
+.doc-tag--green { background: var(--green-dim); color: var(--green); }
+.doc-actions { display: flex; gap: 10px; padding: 20px 28px; background: var(--surface-2); border-top: 1px solid var(--border); flex-wrap: wrap; }
+.doc-btn { font-size: 14px; font-weight: 600; padding: 11px 22px; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 6px; }
+.doc-btn--accept { background: var(--green); color: white; }
+.doc-btn--accept:hover { filter: brightness(1.1); }
+.doc-btn--edit { background: white; color: var(--text); border: 1px solid var(--border-bright); }
+.doc-btn--edit:hover { background: var(--accent-dim); border-color: var(--accent); }
+.doc-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.doc-empty { text-align: center; padding: 60px 24px; color: var(--text-dim); }
+.doc-empty__icon { width: 72px; height: 72px; border-radius: 18px; background: var(--surface-2); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+.doc-empty__icon svg { width: 36px; height: 36px; stroke: var(--text-dim); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.doc-empty h3 { font-size: 18px; font-weight: 700; color: var(--text-bright); margin-bottom: 8px; }
+.doc-empty p { font-size: 14px; max-width: 400px; margin: 0 auto; line-height: 1.6; }
+
+/* VISIT HISTORY TIMELINE */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-item::before { content: ''; position: absolute; left: -20px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid white; box-shadow: 0 0 0 2px var(--accent); }
+.timeline-item__date { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.timeline-item__card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; }
+.timeline-item__cc { font-size: 14px; font-weight: 700; color: var(--text-bright); margin-bottom: 4px; }
+.timeline-item__detail { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+/* DISCLAIMER */
+.disclaimer { margin-top: 16px; background: var(--amber-dim); border: 1px solid rgba(217,138,0,0.20); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 12px; color: var(--amber); line-height: 1.5; display: flex; align-items: flex-start; gap: 8px; }
+.disclaimer svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* MVP CARDS */
+.mvp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.mvp-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; position: relative; transition: transform 0.2s ease, box-shadow 0.2s ease; overflow: hidden; }
+.mvp-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.mvp-card__bar { position: absolute; top: 0; left: 0; width: 100%; height: 3px; }
+.mvp-card__bar--1 { background: var(--accent); }
+.mvp-card__bar--2 { background: var(--teal); }
+.mvp-card__bar--3 { background: var(--green); }
+.mvp-card__bar--4 { background: var(--red); }
+.mvp-card__num { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--text-dim); letter-spacing: 1.5px; margin-bottom: 14px; }
+.mvp-card__icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.mvp-card__icon svg { width: 23px; height: 23px; stroke-width: 2; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.mvp-card__icon--1 { background: var(--accent-dim); color: var(--accent); }
+.mvp-card__icon--2 { background: var(--teal-dim); color: var(--teal); }
+.mvp-card__icon--3 { background: var(--green-dim); color: var(--green); }
+.mvp-card__icon--4 { background: var(--red-dim); color: var(--red); }
+.mvp-card h3 { font-size: 16px; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
+.mvp-card p { font-size: 13.5px; color: var(--text-dim); line-height: 1.6; }
+
+/* COMPARE */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) { .compare { grid-template-columns: 1fr; } }
+.compare-col { border-radius: var(--radius); padding: 26px; border: 1px solid var(--border); }
+.compare-col--without { background: #fdf4f6; border-color: rgba(212,69,111,0.18); }
+.compare-col--with { background: #f1f9f4; border-color: rgba(26,158,90,0.20); }
+.compare-tag { display: inline-flex; font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 5px 12px; border-radius: 6px; margin-bottom: 14px; }
+.compare-col--without .compare-tag { background: var(--rose-dim); color: var(--rose); }
+.compare-col--with .compare-tag { background: var(--green-dim); color: var(--green); }
+.compare-col h3 { font-size: 18px; font-weight: 700; color: var(--text-bright); margin-bottom: 14px; }
+.compare-list { list-style: none; padding: 0; }
+.compare-list li { padding: 7px 0 7px 26px; position: relative; font-size: 14px; color: var(--text); line-height: 1.5; }
+.compare-list li::before { position: absolute; left: 0; top: 7px; font-weight: 700; font-size: 15px; }
+.compare-col--without .compare-list li::before { content: '\2717'; color: var(--rose); }
+.compare-col--with .compare-list li::before { content: '\2713'; color: var(--green); }
+
+/* CTA */
+.cta-band { background: linear-gradient(135deg, var(--accent-deep), var(--accent)); border-radius: 22px; padding: 48px 36px; text-align: center; color: white; position: relative; overflow: hidden; box-shadow: var(--shadow-lg); }
+.cta-band::before { content: ''; position: absolute; top: -40%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(255,255,255,0.06); }
+.cta-band::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 300px; height: 300px; border-radius: 50%; background: rgba(13,154,166,0.25); }
+.cta-band > * { position: relative; z-index: 1; }
+.cta-band h2 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+.cta-band p { font-size: 16px; opacity: 0.92; margin-bottom: 24px; max-width: 520px; margin-left: auto; margin-right: auto; }
+.cta-band .btn-primary { background: white; color: var(--accent-deep); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+.cta-band .btn-primary:hover { background: var(--surface-2); transform: translateY(-2px); }
+
+/* FOOTER */
+footer { border-top: 1px solid var(--border); padding: 32px 0; background: var(--surface); }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.footer-inner p { font-size: 13px; color: var(--text-dim); }
+.footer-links { display: flex; gap: 18px; }
+.footer-links a { font-size: 13px; color: var(--text-dim); text-decoration: none; }
+.footer-links a:hover { color: var(--accent); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+</style>
+</head>
+<body>
+<!-- Firebase connected: authentication and patient history are now cloud-backed. -->
+
+
+<!-- ===== AUTH ===== -->
+<section id="authSection">
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="auth-brand__logo">
+        <span class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/><path d="M12 8v5M9.5 10.5h5"/></svg></span>
+        <span>MediKiosk</span>
+      </div>
+      <div class="auth-brand__hero">
+        <h2>AI-Powered Patient History, Linked to ABHA</h2>
+        <p>Collect history via multilingual AI voice conversation, scan old records, detect red flags, and give doctors a ready-to-review summary — all linked to the patient's ABHA ID.</p>
+        <ul class="auth-brand__features">
+          <li>Multilingual AI history with compulsory Dashavidha Pariksha (10 Ayurvedic assessments)</li>
+          <li>OCR digitization of prescriptions & lab reports</li>
+          <li>ABHA-linked history saved to your ABHA ID — accessible anytime</li>
+        </ul>
+      </div>
+      <div class="auth-brand__tag">Smart India Hackathon</div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin">Login</button>
+        <button class="auth-tab" id="tabSignup">Sign Up</button>
+      </div>
+      <div class="auth-error" id="authError">Please fill in all required fields.</div>
+      <div class="auth-success" id="authSuccess"></div>
+      <form class="auth-form active" id="loginForm">
+        <div class="auth-form-group"><label>ABHA ID <span class="req">*</span></label><input type="text" class="form-input" id="loginId" placeholder="e.g. 91-1234-5678-9012" autocomplete="off" /></div>
+        <div class="auth-form-group"><label>Full Name <span class="req">*</span></label><input type="text" class="form-input" id="loginName" placeholder="e.g. Rajesh Kumar" autocomplete="name" /></div>
+        <div class="auth-form-group"><label>Password <span class="req">*</span></label><input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" /></div>
+        <button type="submit" class="btn-auth">Login to Portal <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <div class="auth-switch" style="margin-top:18px;">New patient? <a id="switchToSignup">Create an account</a></div>
+      </form>
+      <form class="auth-form" id="signupForm">
+        <div class="auth-form-group"><label>Full Name <span class="req">*</span></label><input type="text" class="form-input" id="signupName" placeholder="e.g. Rajesh Kumar" autocomplete="name" /></div>
+        <div class="form-row">
+        <div class="auth-form-group"><label>Date of Birth <span class="req">*</span></label><input type="date" class="form-input" id="signupDob" /></div>
+          <div class="auth-form-group"><label>Gender <span class="req">*</span></label><select class="form-input" id="signupGender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+        </div>
+        <div class="auth-form-group"><label>Phone Number <span class="req">*</span></label><input type="tel" class="form-input" id="signupPhone" placeholder="e.g. 98765 43210" autocomplete="tel" /></div>
+        <div class="auth-form-group"><label>Enter ABHA ID <span class="req">*</span></label><input type="text" class="form-input" id="signupId" placeholder="e.g. 91-1234-5678-9012" autocomplete="off" /></div>
+        <div class="form-row">
+          <div class="auth-form-group"><label>Create Password <span class="req">*</span></label><input type="password" class="form-input" id="signupPassword" placeholder="Create a password" autocomplete="new-password" /></div>
+          <div class="auth-form-group"><label>Confirm Password <span class="req">*</span></label><input type="password" class="form-input" id="signupConfirmPassword" placeholder="Re-enter password" autocomplete="new-password" /></div>
+        </div>
+        <button type="submit" class="btn-auth btn-auth--signup">Create Account <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></button>
+        <div class="auth-switch" style="margin-top:18px;">Already have an account? <a id="switchToLogin">Login here</a></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN APP ===== -->
+<div id="mainContent">
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/><path d="M12 8v5M9.5 10.5h5"/></svg></span>MediKiosk</a>
+    <div class="nav-links">
+      <a href="#" class="nav-active" id="navPatientMode">Patient Portal</a>
+      <a href="#myHistory" id="navMyHistory">My History</a>
+      <select id="navLangSelect" class="hero-lang-select" style="font-size:12px; padding:4px 8px; margin-left:8px;"><option value="English">English</option><option value="Hindi">हिंदी</option><option value="Tamil">தமிழ்</option><option value="Telugu">తెలుగు</option><option value="Bengali">বাংলা</option><option value="Marathi">मराठी</option><option value="Kannada">ಕನ್ನಡ</option><option value="Malayalam">മലയാളം</option><option value="Gujarati">ગુજરાતી</option><option value="Punjabi">ਪੰਜਾਬੀ</option></select>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar" id="navAvatar">R</div>
+      <span class="nav-user-name" id="navUserName">Patient</span>
+      <button class="nav-logout" id="logoutBtn">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- PATIENT MODE -->
+<div id="patientMode" class="mode-panel active">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <span class="hero-badge">Smart India Hackathon — Built for Indian Government Hospitals</span>
+          <h1>Collect history <span class="grad">before</span> the doctor sees the patient</h1>
+          <p class="lead">MediKiosk takes patient history via multilingual AI voice conversation, scans old records, detects red flags, and saves it all linked to the patient's ABHA ID. The patient can view their entire history anytime.</p>
+          <div class="hero-cta-row">
+            <a href="#history" class="btn btn-primary">Start AI History <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a href="#scan" class="btn btn-ghost">Scan Documents</a>
+          </div>
+          <div class="hero-lang-row">
+            <label class="hero-lang-label" for="heroLang">Preferred Language:</label>
+            <select id="heroLang" class="hero-lang-select">
+              <option value="Hindi">Hindi (हिंदी)</option><option value="English">English</option><option value="Tamil">Tamil (தமிழ்)</option><option value="Telugu">Telugu (తెలుగు)</option><option value="Bengali">Bengali (বাংলা)</option><option value="Marathi">Marathi (मराठी)</option><option value="Kannada">Kannada (ಕನ್ನಡ)</option><option value="Malayalam">Malayalam (മലയാളം)</option><option value="Gujarati">Gujarati (ગુજરાતી)</option><option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+            </select>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat"><strong>12+</strong><span>Indian languages</span></div>
+            <div class="hero-stat"><strong>ABHA</strong><span>linked history</span></div>
+            <div class="hero-stat"><strong>FHIR</strong><span>interoperability</span></div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 1: AI HISTORY -->
+  <section id="history">
+    <div class="container">
+      <span class="section-label">Feature 1</span>
+      <h2 class="section-title">AI History Taking</h2>
+      <p class="section-subtitle">Speak or type your symptoms. AI asks adaptive follow-ups in your preferred language — including compulsory Dashavidha Pariksha (10 Ayurvedic assessments).</p>
+      <div class="panel">
+        <div class="panel-grid">
+          <div class="panel-left">
+            <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> AI Conversation</div>
+            <span class="chat-lang" id="chatLangLabel">Language: Hindi (हिंदी)</span><span class="chat-ayush-tag" id="chatAyushTag" style="display:inline-flex;">Dashavidha Pariksha</span>
+            <div class="chat-messages" id="chatMessages">
+              <div class="msg msg--ai">Namaste. Main MediKiosk AI hoon. Aapko kya takleef hai? (Tell me your main problem — type or tap below.)</div>
+            </div>
+            <div class="quick-words" id="quickWords" style="flex-wrap:wrap;">
+              <!-- Options populated dynamically by showOptions() -->
+            </div>
+            <div class="chat-input-row" style="margin-top:10px;">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type your symptom or answer..." />
+              <button class="chat-mic" id="micBtn" title="Voice input"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg></button>
+              <button class="chat-send" id="sendBtn" title="Send"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M9 14l2 2 4-4"/></svg> Clinical Summary (Live)</div>
+            <div class="panel-sub">Builds as AI collects info · Saved to ABHA ID on "Save"</div>
+            <div class="summary-block" id="block-cc"><div class="summary-block__label">Chief Complaint</div><div class="summary-block__value"><span class="placeholder">Waiting for patient input…</span></div></div>
+            <div class="summary-block" id="block-hpi"><div class="summary-block__label">HPI</div><div class="summary-block__value"><span class="placeholder">Pending</span></div></div>
+            <div class="summary-block" id="block-past"><div class="summary-block__label">Past Medical History</div><div class="summary-block__value"><span class="placeholder">Pending</span></div></div>
+            <div class="summary-block" id="block-meds"><div class="summary-block__label">Medications & Allergies</div><div class="summary-block__value"><span class="placeholder">Pending</span></div></div>
+            <div class="summary-block" id="block-fam"><div class="summary-block__label">Family History</div><div class="summary-block__value"><span class="placeholder">Pending</span></div></div>
+            <div class="summary-block" id="block-pers"><div class="summary-block__label">Personal History</div><div class="summary-block__value"><span class="placeholder">Pending</span></div></div>
+            <div class="summary-block" id="block-ros"><div class="summary-block__label">Review of Systems</div><div class="summary-block__value"><span class="placeholder">Pending</span></div></div>
+            <div class="summary-block" id="block-ayush"><div class="summary-block__label">Dashavidha Pariksha (Compulsory)</div><div class="summary-block__value"><span class="placeholder">Waiting for Dashavidha Pariksha questions...</span></div></div>
+            <div class="summary-block" id="block-redflag"><div class="summary-block__label">Red-Flag Status</div><div class="summary-block__value"><span class="placeholder">No urgent symptoms detected yet</span></div></div>
+            <div class="summary-actions">
+              <button class="btn-sm btn-sm-save" id="saveHistoryBtn">Save to ABHA</button>
+              <button class="btn-sm btn-sm-edit" id="restartBtn">New Consultation</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MY CLINICAL SUMMARY -->
+  <section id="mySummary">
+    <div class="container">
+      <span class="section-label">Feature 3</span>
+      <h2 class="section-title">My Clinical Summary</h2>
+      <p class="section-subtitle">Your saved consultation summaries. Each block represents one AI history session. Click "View" to see the full details of any visit.</p>
+      <div class="panel">
+        <div class="doc-patient-header" id="summaryHeader" style="border-radius:0; border-bottom:1px solid var(--border);">
+          <div class="doc-p-info">
+            <div class="doc-p-avatar" id="summaryAvatar">P</div>
+            <div>
+              <h3 id="summaryPatientName" style="margin:0;">Patient Name</h3>
+              <div class="doc-p-meta" id="summaryPatientMeta">ABHA: —</div>
+            </div>
+          </div>
+        </div>
+        <div id="summaryCardsList" style="padding:24px;">
+          <div class="doc-empty" style="padding:32px;">
+            <div class="doc-empty__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+            <p>Your saved clinical summaries will appear here as cards. Complete an AI history session and click "Save to ABHA" to create one.</p>
+          </div>
+        </div>
+      </div>
+      <!-- Modal for viewing a full summary -->
+      <div id="summaryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#fff; border-radius:16px; max-width:700px; width:90%; max-height:85vh; overflow-y:auto; padding:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 28px; border-bottom:1px solid var(--border); position:sticky; top:0; background:#fff; border-radius:16px 16px 0 0;">
+            <h3 style="margin:0; color:var(--primary);" id="modalTitle">Visit Details</h3>
+            <button id="closeModalBtn" style="background:none; border:none; cursor:pointer; font-size:24px; color:var(--muted);">&times;</button>
+          </div>
+          <div id="modalContent" style="padding:28px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2: PAST MEDICAL HISTORY (Document Upload) -->
+  <section id="scan">
+    <div class="container">
+      <span class="section-label">Feature 2</span>
+      <h2 class="section-title">Past Medical History</h2>
+      <p class="section-subtitle">Upload your previous medical documents — prescriptions, lab reports, discharge summaries, or medical records. Only medical documents are accepted. Your uploaded documents appear as a timeline on the right.</p>
+      <div class="panel">
+        <div class="panel-grid">
+          <div class="panel-left">
+            <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Upload Medical Documents</div>
+            <div class="panel-sub">PDF, JPG, PNG accepted · Medical documents only</div>
+            <div class="drop-zone" id="dropZone">
+              <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png" style="display:none" />
+              <div class="drop-zone__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6M9 15l3-3 3 3"/></svg></div>
+              <h4>Drag & drop medical files here</h4>
+              <p>or <span class="browse-link" id="browseLink">browse from device</span></p>
+              <p style="font-size:12px; color:var(--muted); margin-top:8px;">Accepted: prescriptions, lab reports, discharge summaries, medical records</p>
+            </div>
+            <div class="file-list" id="fileList"></div>
+            <button class="analyze-btn" id="analyzeBtn" disabled><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Add to History</button>
+          </div>
+          <div class="panel-right">
+            <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg> Document History</div>
+            <div class="panel-sub">Your uploaded medical documents timeline</div>
+            <div id="ocrContent">
+              <div class="ocr-empty"><div class="ocr-empty__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><p>Uploaded medical documents will appear here as a timeline.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 4: RED-FLAG DETECTION -->
+  <section id="redflag">
+    <div class="container">
+      <span class="section-label">Feature 4</span>
+      <h2 class="section-title">Red-Flag Detection</h2>
+      <p class="section-subtitle">When AI detects urgent symptoms during history-taking, it alerts hospital staff immediately — without making an autonomous diagnosis.</p>
+      <div class="redflag-banner" id="redflagBanner" style="display:none;">
+        <div class="redflag-banner__icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+        <div class="redflag-banner__text"><strong>Red flag detected</strong><span id="redflagMsg"></span></div>
+      </div>
+      <div class="panel">
+        <div class="panel-grid">
+          <div class="panel-left">
+            <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg> Test Red-Flag Detection</div>
+            <div class="panel-sub">Tap a symptom to simulate detection</div>
+            <div class="quick-words" style="flex-direction:column; align-items:stretch; gap:10px;">
+              <span class="quick-word quick-word--alert" data-rf="chest" style="text-align:center; padding:12px;">Severe chest pain radiating to arm + sweating</span>
+              <span class="quick-word quick-word--alert" data-rf="stroke" style="text-align:center; padding:12px;">Facial drooping, slurred speech, arm weakness</span>
+              <span class="quick-word quick-word--alert" data-rf="breath" style="text-align:center; padding:12px;">Severe breathing difficulty, blue lips</span>
+              <span class="quick-word quick-word--alert" data-rf="bleed" style="text-align:center; padding:12px;">Vomiting blood, black stools</span>
+              <span class="quick-word" data-rf="reset" style="text-align:center; padding:12px;">Clear / Reset</span>
+            </div>
+          </div>
+          <div class="panel-right">
+            <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Detection Results</div>
+            <div id="redflagResults">
+              <div class="ocr-empty"><div class="ocr-empty__icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.64"/></svg></div><p>Tap a symptom to simulate red-flag detection.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section>
+    <div class="container">
+      <span class="section-label">Impact</span>
+      <h2 class="section-title">With vs. without MediKiosk</h2>
+      <div class="compare">
+        <div class="compare-col compare-col--without">
+          <span class="compare-tag">Without MediKiosk</span>
+          <h3>The current reality</h3>
+          <ul class="compare-list">
+            <li>Doctor spends 8-10 min collecting history</li>
+            <li>Searches loose paper prescriptions mid-consult</li>
+            <li>Urgent symptoms missed in rushed 2-5 min window</li>
+            <li>No history linked to ABHA ID — starts from scratch every visit</li>
+            <li>Patient repeats same story every visit</li>
+          </ul>
+        </div>
+        <div class="compare-col compare-col--with">
+          <span class="compare-tag">With MediKiosk</span>
+          <h3>The improved flow</h3>
+          <ul class="compare-list">
+            <li>AI collects full history before the visit in patient's language</li>
+            <li>Old records scanned, digitized, organized</li>
+            <li>Red flags auto-detected, staff alerted</li>
+            <li>Doctor searches ABHA ID — entire history appears instantly</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div><!-- /patientMode -->
+
+<!-- MY VISIT HISTORY (patient-facing) -->
+<section id="myHistory" style="padding:60px 0;">
+  <div class="container">
+    <span class="section-label">Feature 5</span>
+    <h2 class="section-title">My Visit History</h2>
+    <p class="section-subtitle">All your previous MediKiosk consultations, saved to your ABHA ID. Click any visit to see the full clinical summary.</p>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div class="panel-title"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg> Saved Consultations</div>
+        <button class="btn-sm btn-sm-save" id="refreshHistoryBtn"><svg viewBox="0 0 24 24" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:4px;"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Refresh</button>
+      </div>
+      <div id="myHistoryList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="container">
+    <div class="cta-band">
+      <h2>Reduce OPD burden. Improve patient care.</h2>
+      <p>MediKiosk collects complete patient history before consultation, links it to ABHA ID, and gives doctors a structured summary — so they can focus on examination, diagnosis, and counselling.</p>
+      <a href="#history" class="btn btn-primary" id="ctaStart">Start AI History</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <p>MediKiosk — AI-powered multilingual patient history-taking platform. Smart India Hackathon prototype.</p>
+      <div class="footer-links">
+        <a href="#history">AI History</a>
+        <a href="#mySummary">Summary</a>
+        <a href="#myHistory">My History</a>
+        <a href="#scan">Scan</a>
+        <a href="#redflag">Red Flags</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /mainContent -->
+
+<script type="module">
+  // ===== FIREBASE WEB SDK =====
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithCustomToken,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZ78ZW6kuLVgTPkVgF4TF7n55Ls0AVlK0",
+    authDomain: "medikiosk-a0cf3.firebaseapp.com",
+    projectId: "medikiosk-a0cf3",
+    storageBucket: "medikiosk-a0cf3.firebasestorage.app",
+    messagingSenderId: "724137787010",
+    appId: "1:724137787010:web:a2303a8991a6d6a0793e9b",
+    measurementId: "G-5NW78BQ8Y7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.firebaseAuth = auth;
+  window.firebaseDB = db;
+  window.firebaseFns = {
+    signInWithCustomToken,
+    signOut,
+    doc,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    serverTimestamp
+  };
+
+  window.firebaseReady = Promise.resolve({ auth, db });
+  console.log("MediKiosk Firebase initialized");
+</script>
+
+<script>
+// ===== CLOUD DATABASE HELPERS =====
+window.patientHistoryCache = [];
+
+function getRegisteredUsers() {
+  // Authentication is now handled by the MediKiosk backend.
+  return [];
+}
+
+function saveRegisteredUsers(u) {
+  // Kept only for compatibility with any old code paths.
+}
+
+function getPatientHistory(abhaId) {
+  return Array.isArray(window.patientHistoryCache)
+    ? window.patientHistoryCache
+    : [];
+}
+
+async function loadPatientHistory(abhaId) {
+  await window.firebaseReady;
+  const {
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    db
+  } = {
+    collection: window.firebaseFns.collection,
+    getDocs: window.firebaseFns.getDocs,
+    query: window.firebaseFns.query,
+    orderBy: window.firebaseFns.orderBy,
+    db: window.firebaseDB
+  };
+
+  const visitsRef = collection(db, "patients", abhaId, "visits");
+
+  try {
+    const snap = await getDocs(
+      query(visitsRef, orderBy("createdAt", "desc"))
+    );
+
+    window.patientHistoryCache = snap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    return window.patientHistoryCache;
+  } catch (error) {
+    console.error("Could not load patient history:", error);
+    window.patientHistoryCache = [];
+    return [];
+  }
+}
+
+async function savePatientVisit(abhaId, visit) {
+  await window.firebaseReady;
+
+  const visitsRef = window.firebaseFns.collection(
+    window.firebaseDB,
+    "patients",
+    abhaId,
+    "visits"
+  );
+
+  const docRef = await window.firebaseFns.addDoc(
+    visitsRef,
+    {
+      ...visit,
+      createdAt: window.firebaseFns.serverTimestamp()
+    }
+  );
+
+  const savedVisit = { id: docRef.id, ...visit };
+  window.patientHistoryCache = [
+    savedVisit,
+    ...(window.patientHistoryCache || [])
+  ];
+
+  return savedVisit;
+}
+
+// ===== AUTH =====
+const authError = document.getElementById('authError');
+const authSuccess = document.getElementById('authSuccess');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+const tabLogin = document.getElementById('tabLogin');
+const tabSignup = document.getElementById('tabSignup');
+function showAuthError(m) { authError.textContent = m; authError.classList.add('show'); authSuccess.classList.remove('show'); }
+function showAuthSuccess(m) { authSuccess.textContent = m; authSuccess.classList.add('show'); authError.classList.remove('show'); }
+function clearAuthMsgs() { authError.classList.remove('show'); authSuccess.classList.remove('show'); }
+function switchToLogin() { tabLogin.classList.add('active'); tabSignup.classList.remove('active'); loginForm.classList.add('active'); signupForm.classList.remove('active'); clearAuthMsgs(); }
+function switchToSignup() { tabSignup.classList.add('active'); tabLogin.classList.remove('active'); signupForm.classList.add('active'); loginForm.classList.remove('active'); clearAuthMsgs(); }
+tabLogin.addEventListener('click', switchToLogin);
+tabSignup.addEventListener('click', switchToSignup);
+document.getElementById('switchToSignup').addEventListener('click', switchToSignup);
+document.getElementById('switchToLogin').addEventListener('click', switchToLogin);
+
+async function enterApp(name, id, age, gender) {
+  window.patientData = { name, id, age, gender };
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  document.getElementById('navAvatar').textContent = initials;
+  document.getElementById('navUserName').textContent = name;
+  // Set patient info on the My Clinical Summary card
+  var sa = document.getElementById('summaryAvatar'); if (sa) sa.textContent = initials;
+  var sn = document.getElementById('summaryPatientName'); if (sn) sn.textContent = name;
+  var sm = document.getElementById('summaryPatientMeta'); if (sm) sm.textContent = 'ABHA: ' + id + ' | ' + (gender || '—') + ' | DOB: ' + (age || '—');
+  document.body.classList.add('app-active');
+  switchToPatientMode();
+  await loadPatientHistory(id);
+  renderMyHistory();
+  window.scrollTo(0, 0);
+}
+
+loginForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('loginId').value.trim();
+  const name = document.getElementById('loginName').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!id || !password) {
+    showAuthError('Please enter your ABHA ID and Password.');
+    return;
+  }
+
+  try {
+    clearAuthMsgs();
+
+    const response = await fetch('http://localhost:3000/api/patient/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        abhaId: id,
+        name: name,
+        password: password
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Login failed.');
+    }
+
+    await window.firebaseFns.signInWithCustomToken(
+      window.firebaseAuth,
+      data.token
+    );
+
+    const patient = data.patient || {};
+    await enterApp(
+      patient.name || name || 'Patient',
+      patient.abhaId || id,
+      patient.dob || '',
+      patient.gender || ''
+    );
+
+  } catch (error) {
+    console.error('Patient login error:', error);
+    showAuthError(error.message || 'Login failed. Please try again.');
+  }
+});
+
+
+signupForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById('signupName').value.trim();
+  const dob = document.getElementById('signupDob').value;
+  const gender = document.getElementById('signupGender').value;
+  const phone = document.getElementById('signupPhone').value.trim();
+  const id = document.getElementById('signupId').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+  if (!name || !dob || !gender || !phone || !id || !password) {
+    showAuthError('Please fill in all required fields marked with *.');
+    return;
+  }
+
+  if (password.length < 4) {
+    showAuthError('Password must be at least 4 characters long.');
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    showAuthError('Passwords do not match. Please re-enter.');
+    return;
+  }
+
+  try {
+    clearAuthMsgs();
+
+    const response = await fetch('http://localhost:3000/api/patient/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        abhaId: id,
+        name,
+        dob,
+        gender,
+        phone,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Account creation failed.');
+    }
+
+    showAuthSuccess(
+      'Account created successfully! Please login with your ABHA ID and Password.'
+    );
+
+    signupForm.reset();
+    setTimeout(function() {
+      clearAuthMsgs();
+      switchToLogin();
+      document.getElementById('loginId').value = id;
+      document.getElementById('loginName').value = name;
+    }, 1200);
+
+  } catch (error) {
+    console.error('Patient signup error:', error);
+    showAuthError(error.message || 'Account creation failed.');
+  }
+});
+
+
+document.getElementById('logoutBtn').addEventListener('click', async function() {
+  try {
+    await window.firebaseFns.signOut(window.firebaseAuth);
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+
+  window.patientHistoryCache = [];
+  window.patientData = null;
+  document.body.classList.remove('app-active');
+  loginForm.reset();
+  signupForm.reset();
+  switchToLogin();
+  window.scrollTo(0, 0);
+});
+
+// ===== NAV LINKS =====
+function switchToPatientMode() { document.getElementById('ctaStart').textContent = 'Start AI History'; document.getElementById('ctaStart').href = '#history'; }
+document.getElementById('navPatientMode').addEventListener('click', function(e) { e.preventDefault(); window.scrollTo(0, 0); });
+
+// ===== AYUSH TOGGLE =====
+
+// ===== PAGE LANGUAGE TRANSLATION =====
+var pageLang = 'English';
+var translations = {
+  'Hindi': {
+    'Patient Portal': 'पेशेंट पोर्टल',
+    'My History': 'मेरा इतिहास',
+    'Logout': 'लॉगआउट',
+    'Start AI History': 'एआई हिस्ट्री शुरू करें',
+    'Scan Documents': 'दस्तावेज़ स्कैन करें',
+    'Preferred Language:': 'पसंदीदा भाषा:',
+    'AI History Taking': 'एआई इतिहास लेना',
+    'Past Medical History': 'पिछला चिकित्सा इतिहास',
+    'My Clinical Summary': 'मेरी क्लिनिकल सारांश',
+    'Red-Flag Detection': 'रेड-फ्लैग पहचान',
+    'My Visit History': 'मेरा विजिट इतिहास',
+    'Save to ABHA': 'ABHA में सहेजें',
+    'New Consultation': 'नई परामर्श',
+    'Chief Complaint': 'मुख्य शिकायत',
+    'Medications & Allergies': 'दवाएं और एलर्जी',
+    'Family History': 'पारिवारिक इतिहास',
+    'Personal History': 'व्यक्तिगत इतिहास',
+    'Review of Systems': 'सिस्टम समीक्षा',
+    'Red-Flag Status': 'रेड-फ्लैग स्थिति',
+    'Clinical Summary (Live)': 'क्लिनिकल सारांश (लाइव)',
+    'Upload Medical Documents': 'मेडिकल दस्तावेज़ अपलोड करें',
+    'Document History': 'दस्तावेज़ इतिहास',
+    'Login to Portal': 'पोर्टल में लॉगिन करें',
+    'Create Account': 'खाता बनाएं',
+    'Full Name': 'पूरा नाम',
+    'Password': 'पासवर्ड',
+    'Create Password': 'पासवर्ड बनाएं',
+    'Confirm Password': 'पासवर्ड की पुष्टि करें',
+    'Date of Birth': 'जन्म तिथि',
+    'Gender': 'लिंग',
+    'Phone Number': 'फ़ोन नंबर',
+    'Enter ABHA ID': 'ABHA आईडी दर्ज करें',
+    'ABHA ID': 'ABHA आईडी',
+    'Reduce OPD burden. Improve patient care.': 'OPD बोझ कम करें। रोगी देखभाल में सुधार करें।'
+  }
+};
+
+function applyPageLanguage(lang) {
+  pageLang = lang;
+  var t = translations[lang];
+  if (!t) {
+    // English or unsupported — reload to reset
+    return;
+  }
+  document.querySelectorAll('a, button, label, h1, h2, h3, span, p').forEach(function(el) {
+    var text = el.textContent.trim();
+    if (t[text]) el.textContent = t[text];
+  });
+  var hl = document.getElementById('heroLang');
+  if (hl) hl.value = lang;
+  var nl = document.getElementById('navLangSelect');
+  if (nl) nl.value = lang;
+  if (typeof updateLangLabel === 'function') updateLangLabel();
+}
+
+var navLangSelect = document.getElementById('navLangSelect');
+if (navLangSelect) {
+  navLangSelect.addEventListener('change', function() {
+    var lang = navLangSelect.value;
+    var heroLang = document.getElementById('heroLang');
+    if (heroLang) heroLang.value = lang;
+    applyPageLanguage(lang);
+  });
+}
+var heroLangEl = document.getElementById('heroLang');
+if (heroLangEl) {
+  heroLangEl.addEventListener('change', function() {
+    var lang = heroLangEl.value;
+    if (navLangSelect) navLangSelect.value = lang;
+    applyPageLanguage(lang);
+  });
+}
+
+// Dashavidha Pariksha is always enabled — compulsory in every consultation
+const ayushEnabled = true;
+const chatAyushTag = document.getElementById('chatAyushTag');
+
+// ===== HERO LANGUAGE SELECTOR =====
+const heroLang = document.getElementById('heroLang');
+const chatLangLabel = document.getElementById('chatLangLabel');
+function updateLangLabel() {
+  const lang = heroLang ? heroLang.value : 'Hindi';
+  const m = { Hindi:'Hindi (हिंदी)', English:'English', Tamil:'Tamil (தமிழ்)', Telugu:'Telugu (తెలుగు)', Bengali:'Bengali (বাংলা)', Marathi:'Marathi (मराठी)', Kannada:'Kannada (ಕನ್ನಡ)', Malayalam:'Malayalam (മലയാളം)', Gujarati:'Gujarati (ગુજરાતી)', Punjabi:'Punjabi (ਪੰਜਾਬੀ)' };
+  if (chatLangLabel) chatLangLabel.textContent = 'Language: ' + (m[lang] || lang);
+}
+if (heroLang) heroLang.addEventListener('change', updateLangLabel);
+updateLangLabel();
+
+// ===== AI HISTORY CHAT =====
+let chatState = {};
+function initChatState() {
+  chatState = { stage: 0, slotValues: {}, currentKey: null, ayushStage: 0, summaryData: {} };
+}
+initChatState();
+
+const redFlags = [
+  { pattern: /radiating.*arm|arm.*radiating|left arm/i, condition: 'Chest pain radiating to left arm', detail: 'Possible cardiac event — staff alerted. Patient moved to priority queue.' },
+  { pattern: /sweating|diaphoresis/i, condition: 'Sweating with chest pain', detail: 'Diaphoresis with chest pain — possible ACS. Staff alerted.' },
+  { pattern: /facial.*droop|slurred.*speech|arm.*weakness|stroke/i, condition: 'Possible stroke symptoms', detail: 'FAST positive — immediate attention required.' },
+  { pattern: /breathing.*difficult|lips.*blue|cyanosis|severe.*breath/i, condition: 'Severe respiratory distress', detail: 'Possible cyanosis — immediate evaluation needed.' },
+  { pattern: /vomiting.*blood|black.*stool|hematemesis|melena/i, condition: 'GI bleeding', detail: 'Possible GI bleed — urgent evaluation needed.' },
+  { pattern: /severity.*[89]|[89].*10|severe.*pain/i, condition: 'Severe pain (8+/10)', detail: 'High-severity pain — urgent evaluation recommended.' }
+];
+
+// ===== DYNAMIC AI CHATBOT ENGINE =====
+// Each symptom defines: keywords to match it, and "slots" to fill.
+// Slots have: key, label, question, options, and "extract" — a function
+// that scans user text and returns a value if found (or null).
+// The bot only asks about slots that haven't been filled yet.
+
+const symptomDefs = {
+  'chest pain': {
+    label: 'Chest pain',
+    match: function(t) { return (t.includes('chest') && (t.includes('pain') || t.includes('tight') || t.includes('pressure') || t.includes('burn'))) || (t.includes('heart') && t.includes('pain')); },
+    ros: 'Cardiovascular: chest pain.',
+    slots: [
+      { key: 'duration', label: 'Duration', question: 'How long have you had this chest pain?', opts: ['Since today', 'Since 2-3 days', 'Since a week', 'Since weeks/months'],
+        extract: function(t) {
+          if (/today|just now|since morning|few hours/.test(t)) return 'since today';
+          if (/(2|two|3|three)\s*[- ]?\s*day/.test(t)) return '2-3 days';
+          if (/(1|one|a)\s*week/.test(t)) return '1 week';
+          if (/week/.test(t)) return 'weeks';
+          if (/month/.test(t)) return 'months';
+          return null;
+        } },
+      { key: 'location', label: 'Location / Radiation', question: 'Where exactly is the pain? Does it spread anywhere?', opts: ['Center of chest', 'Spreads to left arm', 'Spreads to jaw/back', 'Only on one side'],
+        extract: function(t) {
+          if (/left\s*arm|radiat.*arm|arm.*radiat/.test(t)) return 'radiating to left arm';
+          if (/jaw|back/.test(t)) return 'radiating to jaw/back';
+          if (/center|central|middle/.test(t)) return 'center of chest';
+          if (/left side|right side|one side/.test(t)) return 'one side';
+          return null;
+        } },
+      { key: 'severity', label: 'Severity', question: 'How severe is the pain on a scale of 1 to 10?', opts: ['Mild (1-3)', 'Moderate (4-6)', 'Severe (7-8)', 'Very severe (9-10)'],
+        extract: function(t) {
+          if (/severe|unbearable|worst|9|10/.test(t)) return 'severe (9-10)';
+          if (/[78]/.test(t)) return 'severe (7-8)';
+          if (/[456]/.test(t)) return 'moderate (4-6)';
+          if (/[123]/.test(t) || /mild/.test(t)) return 'mild (1-3)';
+          return null;
+        } },
+      { key: 'triggers', label: 'Triggers / Aggravating factors', question: 'Does anything trigger or worsen the pain — like exertion, stress, or eating?', opts: ['On exertion', 'With stress', 'After eating', 'No clear trigger'],
+        extract: function(t) {
+          if (/exert|walk|exercise|climb|stair/.test(t)) return 'on exertion';
+          if (/stress|anxiety|tension/.test(t)) return 'with stress';
+          if (/eat|food|meal/.test(t)) return 'after eating';
+          if (/no trigger|nothing|not really/.test(t)) return 'no clear trigger';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Do you have any sweating, shortness of breath, nausea, or palpitations with it?', opts: ['Sweating', 'Shortness of breath', 'Nausea', 'No other symptoms'],
+        extract: function(t) {
+          if (/sweat|diaphor/.test(t)) return 'sweating';
+          if (/breath|shortness|dyspnea/.test(t)) return 'shortness of breath';
+          if (/nausea|vomit/.test(t)) return 'nausea';
+          if (/palpit/.test(t)) return 'palpitations';
+          if (/no|none|nothing/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'fever': {
+    label: 'Fever',
+    match: function(t) { return t.includes('fever') || t.includes('temperature') || t.includes('high temp'); },
+    ros: 'Constitutional: fever.',
+    slots: [
+      { key: 'duration', label: 'Duration', question: 'How many days have you had the fever?', opts: ['Since today', '2-3 days', 'More than 5 days', 'More than a week'],
+        extract: function(t) {
+          if (/today|morning|few hours/.test(t)) return 'since today';
+          if (/(2|3|two|three)\s*[- ]?\s*day/.test(t)) return '2-3 days';
+          if (/(4|5|four|five)\s*[- ]?\s*day/.test(t)) return '4-5 days';
+          if (/week/.test(t)) return 'more than a week';
+          return null;
+        } },
+      { key: 'pattern', label: 'Pattern', question: 'Is the fever continuous or does it come and go?', opts: ['Continuous', 'Comes and goes', 'Only at night', 'With chills'],
+        extract: function(t) {
+          if (/continuous|constant|all day/.test(t)) return 'continuous';
+          if (/come.*go|intermittent|on and off/.test(t)) return 'intermittent';
+          if (/night|evening/.test(t)) return 'nighttime';
+          if (/chill|shiver/.test(t)) return 'with chills';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Do you also have chills, body ache, cough, or headache?', opts: ['Chills and body ache', 'Cough', 'Headache', 'No other symptoms'],
+        extract: function(t) {
+          if (/chill|shiver|body ache|body.*pain/.test(t)) return 'chills and body ache';
+          if (/cough/.test(t)) return 'cough';
+          if (/headache|head.*pain/.test(t)) return 'headache';
+          if (/no|none|nothing/.test(t)) return 'none';
+          return null;
+        } },
+      { key: 'medication', label: 'Medication tried', question: 'Have you taken any medication for the fever? Any rashes?', opts: ['Took paracetamol', 'No medication yet', 'Have rashes', 'No rashes'],
+        extract: function(t) {
+          if (/paracetamol|crocin|dolo|fever.*med|medicine|tablet/.test(t)) return 'took medication';
+          if (/rash|red.*spot/.test(t)) return 'has rashes';
+          if (/no med|nothing/.test(t)) return 'no medication';
+          return null;
+        } }
+    ]
+  },
+  'headache': {
+    label: 'Headache',
+    match: function(t) { return t.includes('headache') || t.includes('head ache') || (t.includes('head') && t.includes('pain')); },
+    ros: 'Neurological: headache.',
+    slots: [
+      { key: 'location', label: 'Location', question: 'Where is the headache?', opts: ['One side', 'Both sides', 'Behind the eyes', 'Back of head'],
+        extract: function(t) {
+          if (/one side|left side|right side|unilateral/.test(t)) return 'one side';
+          if (/both side|whole head|all over/.test(t)) return 'both sides';
+          if (/eye|behind/.test(t)) return 'behind eyes';
+          if (/back|occipital/.test(t)) return 'back of head';
+          return null;
+        } },
+      { key: 'character', label: 'Character', question: 'How would you describe the pain?', opts: ['Throbbing', 'Pressing/tight', 'Sharp/stabbing', 'Dull ache'],
+        extract: function(t) {
+          if (/throb|puls/.test(t)) return 'throbbing';
+          if (/press|tight|squeeze|band/.test(t)) return 'pressing/tight';
+          if (/sharp|stab|pierc/.test(t)) return 'sharp/stabbing';
+          if (/dull|ache/.test(t)) return 'dull ache';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this headache?', opts: ['Since today', 'Since 2-3 days', 'Recurrent episodes', 'Chronic/long-standing'],
+        extract: function(t) {
+          if (/today|morning|few hour/.test(t)) return 'since today';
+          if (/(2|3|two|three)\s*day/.test(t)) return '2-3 days';
+          if (/recurren|on and off|episodes|come.*go/.test(t)) return 'recurrent';
+          if (/week|month|chronic|long/.test(t)) return 'chronic';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Is there any nausea, vomiting, or sensitivity to light?', opts: ['Nausea/vomiting', 'Sensitivity to light', 'Blurred vision', 'No other symptoms'],
+        extract: function(t) {
+          if (/nausea|vomit/.test(t)) return 'nausea/vomiting';
+          if (/light|sensitive|photophob/.test(t)) return 'photophobia';
+          if (/blur|vision/.test(t)) return 'blurred vision';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'stomach pain': {
+    label: 'Abdominal pain',
+    match: function(t) { return t.includes('stomach') || t.includes('abdom') || t.includes('belly') || (t.includes('gastric') && t.includes('pain')); },
+    ros: 'GI: abdominal pain.',
+    slots: [
+      { key: 'location', label: 'Location', question: 'Where is the pain in your abdomen?', opts: ['Upper abdomen', 'Lower abdomen', 'Around navel', 'Right side'],
+        extract: function(t) {
+          if (/upper|epigastric|above/.test(t)) return 'upper abdomen';
+          if (/lower/.test(t)) return 'lower abdomen';
+          if (/navel|umbilic|center|centre/.test(t)) return 'around navel';
+          if (/right/.test(t)) return 'right side';
+          return null;
+        } },
+      { key: 'character', label: 'Character', question: 'What type of pain is it?', opts: ['Burning', 'Cramping', 'Sharp', 'Dull ache'],
+        extract: function(t) {
+          if (/burn|acidity|acid/.test(t)) return 'burning';
+          if (/cramp|spasm/.test(t)) return 'cramping';
+          if (/sharp|stab/.test(t)) return 'sharp';
+          if (/dull|ache/.test(t)) return 'dull ache';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this pain?', opts: ['Since today', 'Since 2-3 days', 'Since a week', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/(2|3|two|three)\s*day/.test(t)) return '2-3 days';
+          if (/week/.test(t)) return '1 week';
+          if (/on and off|come.*go|recurren/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any nausea, vomiting, diarrhea, or constipation?', opts: ['Nausea/vomiting', 'Diarrhea', 'Constipation', 'No other symptoms'],
+        extract: function(t) {
+          if (/nausea|vomit/.test(t)) return 'nausea/vomiting';
+          if (/diarrhea|loose motion|loose stool/.test(t)) return 'diarrhea';
+          if (/constipat/.test(t)) return 'constipation';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'joint pain': {
+    label: 'Joint pain',
+    match: function(t) { return t.includes('joint') || t.includes('knee') || t.includes('arthritis') || t.includes('elbow'); },
+    ros: 'Musculoskeletal: joint pain.',
+    slots: [
+      { key: 'location', label: 'Joints affected', question: 'Which joints are affected?', opts: ['Knees', 'Hands/fingers', 'Hips', 'Back/spine'],
+        extract: function(t) {
+          if (/knee/.test(t)) return 'knees';
+          if (/hand|finger|wrist/.test(t)) return 'hands/fingers';
+          if (/hip/.test(t)) return 'hips';
+          if (/back|spine/.test(t)) return 'back/spine';
+          return null;
+        } },
+      { key: 'inflammation', label: 'Inflammation signs', question: 'Is there any swelling, redness, or warmth around the joints?', opts: ['Swelling present', 'Redness', 'Warmth', 'No swelling/redness'],
+        extract: function(t) {
+          if (/swell/.test(t)) return 'swelling';
+          if (/red/.test(t)) return 'redness';
+          if (/warm|hot/.test(t)) return 'warmth';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } },
+      { key: 'pattern', label: 'Timing', question: 'When is the pain worse?', opts: ['Morning', 'After activity', 'Continuous', 'Comes and goes'],
+        extract: function(t) {
+          if (/morning|wake up/.test(t)) return 'morning';
+          if (/after.*activity|exercise|walk/.test(t)) return 'after activity';
+          if (/continuous|constant|all the time/.test(t)) return 'continuous';
+          if (/come.*go|on and off/.test(t)) return 'comes and goes';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this joint pain?', opts: ['Since a few days', 'Since weeks', 'Since months', 'Chronic'],
+        extract: function(t) {
+          if (/today|few day|2|3 day/.test(t)) return 'few days';
+          if (/week/.test(t)) return 'weeks';
+          if (/month/.test(t)) return 'months';
+          if (/year|chronic|long/.test(t)) return 'chronic';
+          return null;
+        } }
+    ]
+  },
+  'weakness': {
+    label: 'Generalized weakness',
+    match: function(t) { return t.includes('weak') || t.includes('tired') || t.includes('fatigue') || t.includes('exhausted'); },
+    ros: 'Constitutional: fatigue.',
+    slots: [
+      { key: 'duration', label: 'Onset', question: 'Since when are you feeling weak?', opts: ['Since today', 'Since a few days', 'Since weeks', 'Since months'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/week/.test(t)) return 'weeks';
+          if (/month/.test(t)) return 'months';
+          return null;
+        } },
+      { key: 'pattern', label: 'Pattern', question: 'Is it constant or does it come and go?', opts: ['Constant', 'Comes and goes', 'Worse in evening', 'After exertion'],
+        extract: function(t) {
+          if (/constant|all day|continuous/.test(t)) return 'constant';
+          if (/come.*go|on and off|intermittent/.test(t)) return 'intermittent';
+          if (/evening|night|end of day/.test(t)) return 'worse in evening';
+          if (/exert|walk|work/.test(t)) return 'after exertion';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Do you also have dizziness, palpitations, or unintentional weight loss?', opts: ['Dizziness', 'Palpitations', 'Weight loss', 'No other symptoms'],
+        extract: function(t) {
+          if (/dizz|giddy|lightheaded/.test(t)) return 'dizziness';
+          if (/palpit|heart.*rac/.test(t)) return 'palpitations';
+          if (/weight.*loss|losing weight/.test(t)) return 'weight loss';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'arm pain': {
+    label: 'Arm/Forearm pain',
+    match: function(t) { return t.includes('arm') || t.includes('forearm') || t.includes('elbow') || (t.includes('hand') && t.includes('pain')) || t.includes('wrist'); },
+    ros: 'Musculoskeletal: arm pain.',
+    slots: [
+      { key: 'location', label: 'Location', question: 'Which arm is affected?', opts: ['Left arm', 'Right arm', 'Both arms', 'Forearm'],
+        extract: function(t) {
+          if (/left/.test(t)) return 'left arm';
+          if (/right/.test(t)) return 'right arm';
+          if (/both/.test(t)) return 'both arms';
+          if (/forearm/.test(t)) return 'forearm';
+          return null;
+        } },
+      { key: 'character', label: 'Character', question: 'What type of pain is it?', opts: ['Sharp/stabbing', 'Dull ache', 'Burning', 'Tingling/numbness'],
+        extract: function(t) {
+          if (/sharp|stab/.test(t)) return 'sharp/stabbing';
+          if (/dull|ache/.test(t)) return 'dull ache';
+          if (/burn/.test(t)) return 'burning';
+          if (/tingl|numb|pins.*needle/.test(t)) return 'tingling/numbness';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this pain?', opts: ['Since today', 'Since a few days', 'Since a week', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/week/.test(t)) return '1 week';
+          if (/on and off|come.*go/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated factors', question: 'Any swelling, injury, or weakness in grip?', opts: ['Swelling', 'Injury/trauma', 'Weakness in grip', 'No other symptoms'],
+        extract: function(t) {
+          if (/swell/.test(t)) return 'swelling';
+          if (/injur|trauma|fell|hurt|twist/.test(t)) return 'injury';
+          if (/weak.*grip|grip.*weak|can.*grasp/.test(t)) return 'weak grip';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'back pain': {
+    label: 'Back pain',
+    match: function(t) { return (t.includes('back') && (t.includes('pain') || t.includes('ache'))); },
+    ros: 'Musculoskeletal: back pain.',
+    slots: [
+      { key: 'location', label: 'Location', question: 'Where is the back pain?', opts: ['Upper back', 'Lower back', 'Neck/shoulder', 'Whole back'],
+        extract: function(t) {
+          if (/upper|thoracic|between shoulder/.test(t)) return 'upper back';
+          if (/lower|lumbar|lower back|waist/.test(t)) return 'lower back';
+          if (/neck|shoulder|cervical/.test(t)) return 'neck/shoulder';
+          if (/whole|entire|all over/.test(t)) return 'whole back';
+          return null;
+        } },
+      { key: 'character', label: 'Character', question: 'What type of pain is it?', opts: ['Sharp/stabbing', 'Dull ache', 'Burning', 'Stiffness'],
+        extract: function(t) {
+          if (/sharp|stab/.test(t)) return 'sharp/stabbing';
+          if (/dull|ache/.test(t)) return 'dull ache';
+          if (/burn/.test(t)) return 'burning';
+          if (/stiff|tight|can.*move/.test(t)) return 'stiffness';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this back pain?', opts: ['Since today', 'Since a few days', 'Since weeks', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/week|month/.test(t)) return 'weeks';
+          if (/on and off|come.*go|recurren/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Does the pain radiate to your leg, or is there numbness/tingling?', opts: ['Radiates to leg', 'Numbness/tingling', 'After injury', 'No other symptoms'],
+        extract: function(t) {
+          if (/radiat|shoot|leg|thigh|calf/.test(t)) return 'radiates to leg';
+          if (/numb|tingl|pins.*needle/.test(t)) return 'numbness/tingling';
+          if (/injur|fell|lift|twist|trauma/.test(t)) return 'after injury';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'cough': {
+    label: 'Cough',
+    match: function(t) { return t.includes('cough'); },
+    ros: 'Respiratory: cough.',
+    slots: [
+      { key: 'duration', label: 'Duration', question: 'How long have you had the cough?', opts: ['Since a few days', 'Since a week', 'Since 2+ weeks', 'Chronic'],
+        extract: function(t) {
+          if (/few day|2|3 day|today/.test(t)) return 'few days';
+          if (/week/.test(t)) return '1 week';
+          if (/(2|two)\s*week|more than a week/.test(t)) return '2+ weeks';
+          if (/month|chronic|long/.test(t)) return 'chronic';
+          return null;
+        } },
+      { key: 'type', label: 'Type', question: 'Is it a dry cough or do you bring up sputum/phlegm?', opts: ['Dry cough', 'With sputum/phlegm', 'With blood', 'Worse at night'],
+        extract: function(t) {
+          if (/dry/.test(t)) return 'dry';
+          if (/sputum|phlegm|mucous|yellow|green/.test(t)) return 'with sputum';
+          if (/blood/.test(t)) return 'with blood';
+          if (/night|sleep|lying/.test(t)) return 'worse at night';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any fever, chest congestion, or breathlessness?', opts: ['Fever', 'Chest congestion', 'Breathlessness', 'No other symptoms'],
+        extract: function(t) {
+          if (/fever/.test(t)) return 'fever';
+          if (/congest|tight|heavy chest/.test(t)) return 'chest congestion';
+          if (/breath|shortness|dyspnea/.test(t)) return 'breathlessness';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'throat pain': {
+    label: 'Throat pain / Sore throat',
+    match: function(t) { return t.includes('throat') || t.includes('sore throat'); },
+    ros: 'ENT: sore throat.',
+    slots: [
+      { key: 'duration', label: 'Duration', question: 'How long have you had throat pain?', opts: ['Since today', '2-3 days', 'More than a week', 'Recurrent'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/(2|3|two|three)\s*day/.test(t)) return '2-3 days';
+          if (/week/.test(t)) return 'more than a week';
+          if (/recurren|on and off|again.*again/.test(t)) return 'recurrent';
+          return null;
+        } },
+      { key: 'character', label: 'Symptoms', question: 'What are you experiencing?', opts: ['Pain while swallowing', 'Dry/scratchy throat', 'Swollen glands', 'Voice change'],
+        extract: function(t) {
+          if (/swallow|swallowing/.test(t)) return 'pain on swallowing';
+          if (/dry|scratch/.test(t)) return 'dry/scratchy';
+          if (/swell|gland|lymph/.test(t)) return 'swollen glands';
+          if (/voice|hoarse/.test(t)) return 'voice change';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any fever, cough, or white patches?', opts: ['Fever', 'Cough', 'White patches', 'No other symptoms'],
+        extract: function(t) {
+          if (/fever/.test(t)) return 'fever';
+          if (/cough/.test(t)) return 'cough';
+          if (/white|patch|spot/.test(t)) return 'white patches';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'skin problem': {
+    label: 'Skin problem / Rash',
+    match: function(t) { return t.includes('skin') || t.includes('rash') || t.includes('itch'); },
+    ros: 'Integumentary: skin rash.',
+    slots: [
+      { key: 'location', label: 'Location', question: 'Where is the skin problem?', opts: ['Face', 'Arms/hands', 'Legs', 'Whole body'],
+        extract: function(t) {
+          if (/face/.test(t)) return 'face';
+          if (/arm|hand/.test(t)) return 'arms/hands';
+          if (/leg|foot|feet/.test(t)) return 'legs';
+          if (/whole|all over|entire body/.test(t)) return 'whole body';
+          return null;
+        } },
+      { key: 'appearance', label: 'Appearance', question: 'What does it look like?', opts: ['Red rash', 'Itchy patches', 'Blisters', 'Dry/scaly skin'],
+        extract: function(t) {
+          if (/red|rash/.test(t)) return 'red rash';
+          if (/itch/.test(t)) return 'itchy patches';
+          if (/blister|bubble|water/.test(t)) return 'blisters';
+          if (/dry|scaly|flaky/.test(t)) return 'dry/scaly';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this?', opts: ['Since today', 'Since a few days', 'Since weeks', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/week|month/.test(t)) return 'weeks';
+          if (/on and off|come.*go/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Is there itching, burning, or is it spreading?', opts: ['Itching', 'Burning sensation', 'Spreading', 'No other symptoms'],
+        extract: function(t) {
+          if (/itch/.test(t)) return 'itching';
+          if (/burn/.test(t)) return 'burning';
+          if (/spread|increasing|growing/.test(t)) return 'spreading';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'dizziness': {
+    label: 'Dizziness / Vertigo',
+    match: function(t) { return t.includes('dizz') || t.includes('vertigo') || t.includes('giddy') || t.includes('lightheaded'); },
+    ros: 'Neurological: dizziness.',
+    slots: [
+      { key: 'duration', label: 'Onset', question: 'How long have you had dizziness?', opts: ['Since today', 'Since a few days', 'Episodes on and off', 'Chronic'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/episode|on and off|come.*go/.test(t)) return 'episodes';
+          if (/week|month|chronic|long/.test(t)) return 'chronic';
+          return null;
+        } },
+      { key: 'character', label: 'Character', question: 'How would you describe it?', opts: ['Spinning sensation', 'Lightheadedness', 'Loss of balance', 'Fainting feeling'],
+        extract: function(t) {
+          if (/spin|vertigo|room.*mov/.test(t)) return 'spinning';
+          if (/light|lightheaded|faint|woozy/.test(t)) return 'lightheadedness';
+          if (/balance|stumble|fall/.test(t)) return 'loss of balance';
+          if (/faint|black out|unconscious/.test(t)) return 'fainting';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any nausea, hearing changes, or headache?', opts: ['Nausea/vomiting', 'Hearing changes', 'Headache', 'No other symptoms'],
+        extract: function(t) {
+          if (/nausea|vomit/.test(t)) return 'nausea/vomiting';
+          if (/hear|ear|ring|tinnitus/.test(t)) return 'hearing changes';
+          if (/headache|head.*pain/.test(t)) return 'headache';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'vomiting': {
+    label: 'Vomiting / Nausea',
+    match: function(t) { return t.includes('vomit') || t.includes('nausea') || t.includes('throwing up'); },
+    ros: 'GI: vomiting/nausea.',
+    slots: [
+      { key: 'duration', label: 'Duration', question: 'How long have you had vomiting/nausea?', opts: ['Since today', '2-3 days', 'More than a week', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/(2|3|two|three)\s*day/.test(t)) return '2-3 days';
+          if (/week/.test(t)) return 'more than a week';
+          if (/on and off|come.*go/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'frequency', label: 'Frequency', question: 'How often do you vomit?', opts: ['Once/twice a day', 'After eating', 'Continuous', 'Only in morning'],
+        extract: function(t) {
+          if (/once|twice|1|2 time/.test(t)) return '1-2 times/day';
+          if (/after.*eat|after.*food|after.*meal/.test(t)) return 'after eating';
+          if (/continuous|all time|cannot stop/.test(t)) return 'continuous';
+          if (/morning/.test(t)) return 'morning only';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any abdominal pain, fever, or diarrhea?', opts: ['Abdominal pain', 'Fever', 'Diarrhea', 'No other symptoms'],
+        extract: function(t) {
+          if (/abdom|stomach|belly.*pain/.test(t)) return 'abdominal pain';
+          if (/fever/.test(t)) return 'fever';
+          if (/diarrhea|loose/.test(t)) return 'diarrhea';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'eye problem': {
+    label: 'Eye problem',
+    match: function(t) { return t.includes('eye') || t.includes('vision') || t.includes('blurred'); },
+    ros: 'Ophthalmological: eye problem.',
+    slots: [
+      { key: 'location', label: 'Affected eye', question: 'Which eye is affected?', opts: ['Left eye', 'Right eye', 'Both eyes', 'Around the eyes'],
+        extract: function(t) {
+          if (/left/.test(t)) return 'left eye';
+          if (/right/.test(t)) return 'right eye';
+          if (/both/.test(t)) return 'both eyes';
+          if (/around|near|beside/.test(t)) return 'around eyes';
+          return null;
+        } },
+      { key: 'symptom', label: 'Symptom', question: 'What are you experiencing?', opts: ['Redness', 'Pain', 'Blurred vision', 'Itching/watering'],
+        extract: function(t) {
+          if (/red/.test(t)) return 'redness';
+          if (/pain|hurt/.test(t)) return 'pain';
+          if (/blur|cannot see|vision/.test(t)) return 'blurred vision';
+          if (/itch|water|tear/.test(t)) return 'itching/watering';
+          return null;
+        } },
+      { key: 'duration', label: 'Duration', question: 'How long have you had this?', opts: ['Since today', 'Since a few days', 'Since a week', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/week/.test(t)) return '1 week';
+          if (/on and off|come.*go/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any headache, sensitivity to light, or discharge?', opts: ['Headache', 'Sensitivity to light', 'Discharge', 'No other symptoms'],
+        extract: function(t) {
+          if (/headache|head.*pain/.test(t)) return 'headache';
+          if (/light|sensitive|photophob/.test(t)) return 'photophobia';
+          if (/discharge|pus|sticky/.test(t)) return 'discharge';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  },
+  'breathing problem': {
+    label: 'Breathing difficulty',
+    match: function(t) { return t.includes('breath') || t.includes('shortness') || t.includes('wheez'); },
+    ros: 'Respiratory: shortness of breath.',
+    slots: [
+      { key: 'duration', label: 'Duration', question: 'How long have you had breathing difficulty?', opts: ['Since today', 'Since a few days', 'Since weeks', 'On and off'],
+        extract: function(t) {
+          if (/today|morning/.test(t)) return 'since today';
+          if (/few day|2|3 day/.test(t)) return 'few days';
+          if (/week|month/.test(t)) return 'weeks';
+          if (/on and off|come.*go|episode/.test(t)) return 'on and off';
+          return null;
+        } },
+      { key: 'pattern', label: 'Pattern', question: 'When is it worse?', opts: ['On exertion', 'At rest', 'At night/lying down', 'Constant'],
+        extract: function(t) {
+          if (/exert|walk|exercise|climb|stair/.test(t)) return 'on exertion';
+          if (/rest|sitting|still/.test(t)) return 'at rest';
+          if (/night|lying|sleep|flat/.test(t)) return 'at night/lying down';
+          if (/constant|all the time|continuous/.test(t)) return 'constant';
+          return null;
+        } },
+      { key: 'associated', label: 'Associated symptoms', question: 'Any cough, chest pain, or wheezing?', opts: ['Cough', 'Chest pain', 'Wheezing', 'No other symptoms'],
+        extract: function(t) {
+          if (/cough/.test(t)) return 'cough';
+          if (/chest.*pain|pain.*chest/.test(t)) return 'chest pain';
+          if (/wheez|whistl/.test(t)) return 'wheezing';
+          if (/no|none/.test(t)) return 'none';
+          return null;
+        } }
+    ]
+  }
+};
+
+// Generic pain fallback — if patient says "pain" but we can't identify where
+function matchSymptom(text) {
+  var t = text.toLowerCase();
+  for (var key in symptomDefs) {
+    if (symptomDefs[key].match(t)) return key;
+  }
+  if (t.includes('pain') || t.includes('ache') || t.includes('hurt')) return 'generic pain';
+  return null;
+}
+
+// Extract all filled slot values from a piece of text for a given symptom
+function extractSlots(symptomKey, text) {
+  var def = symptomDefs[symptomKey];
+  if (!def) return {};
+  var extracted = {};
+  var t = text.toLowerCase();
+  def.slots.forEach(function(slot) {
+    var val = slot.extract(t);
+    if (val) extracted[slot.key] = val;
+  });
+  return extracted;
+}
+
+// Build HPI text from collected slot values
+function buildHPI(symptomKey, slotValues) {
+  var def = symptomDefs[symptomKey];
+  if (!def) return '';
+  var parts = [];
+  def.slots.forEach(function(slot) {
+    if (slotValues[slot.key]) parts.push(slot.label + ': ' + slotValues[slot.key]);
+  });
+  return parts.join('; ') + '.';
+}
+
+// Find next unfilled slot
+function nextUnfilledSlot(symptomKey, slotValues) {
+  var def = symptomDefs[symptomKey];
+  if (!def) return null;
+  for (var i = 0; i < def.slots.length; i++) {
+    if (!slotValues[def.slots[i].key]) return def.slots[i];
+  }
+  return null;
+}
+
+
+// AYUSH Dashavidha Pariksha — 10 compulsory questions
+const ayushQuestions = [
+  { label: 'Prakriti (Body Type)', question: 'How would you describe your natural body type? (Prakriti)', opts: ['Lean/Thin', 'Medium', 'Broad/Heavily built', 'Not sure'] },
+  { label: 'Vikriti (Current Illness)', question: 'What health problem or illness are you currently experiencing? (Vikriti)', opts: ['No current illness', 'Mild', 'Moderate', 'Severe', 'Other'] },
+  { label: 'Sara (Tissue Quality)', question: 'How would you describe the overall quality and strength of your body? (Sara)', opts: ['Very good', 'Good', 'Average', 'Weak', 'Not sure'] },
+  { label: 'Samhanana (Physical Build)', question: 'How would you describe your overall physical build and body strength? (Samhanana)', opts: ['Strong/Well-built', 'Average', 'Weak/Poorly built', 'Not sure'] },
+  { label: 'Pramana (Height & Weight)', question: 'What is your height and weight? (Pramana) — Please type your height in cm and weight in kg.', opts: ['Height: 150-160 cm, Weight: 40-55 kg', 'Height: 160-170 cm, Weight: 55-70 kg', 'Height: 170-180 cm, Weight: 70-85 kg', 'Height: 180+ cm, Weight: 85+ kg'] },
+  { label: 'Satmya (Tolerance)', question: 'Are there any foods, activities, weather conditions, or habits that your body does not tolerate well? (Satmya)', opts: ['No problems', 'Food intolerance', 'Environmental intolerance', 'Activity intolerance', 'Other'] },
+  { label: 'Sattva (Mental Coping)', question: 'How well do you usually cope with stress, illness, or difficult situations? (Sattva)', opts: ['Very well', 'Well', 'Moderately', 'Poorly', 'Prefer not to say'] },
+  { label: 'Ahara Shakti (Appetite & Digestion)', question: 'How is your appetite and digestion after eating? (Ahara Shakti)', opts: ['Good', 'Normal', 'Poor appetite', 'Frequent indigestion', 'Other'] },
+  { label: 'Vyayama Shakti (Exercise Capacity)', question: 'How much physical activity or exercise can you comfortably do? (Vyayama Shakti)', opts: ['Very high', 'Good', 'Moderate', 'Low', 'Unable currently'] },
+  { label: 'Vaya (Age)', question: 'What is your age? (Vaya) — Please type your age in years.', opts: ['Under 18', '18-40', '41-60', 'Above 60'] }
+];
+
+const messagesEl = document.getElementById('chatMessages');
+const inputEl = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const quickWords = document.getElementById('quickWords');
+const blocks = {
+  cc: document.getElementById('block-cc'), hpi: document.getElementById('block-hpi'),
+  past: document.getElementById('block-past'), meds: document.getElementById('block-meds'),
+  fam: document.getElementById('block-fam'), pers: document.getElementById('block-pers'),
+  ros: document.getElementById('block-ros'), ayush: document.getElementById('block-ayush'),
+  redflag: document.getElementById('block-redflag')
+};
+
+function addMsg(text, who) { const d = document.createElement('div'); d.className = 'msg msg--' + who; d.textContent = text; messagesEl.appendChild(d); messagesEl.scrollTop = messagesEl.scrollHeight; }
+function addAIMsg(text) { return new Promise(r => setTimeout(() => { addMsg(text, 'ai'); r(); }, 500)); }
+function setBlock(key, value, isAlert) { const b = blocks[key]; if (!b) return; b.querySelector('.summary-block__value').innerHTML = value; b.classList.add('filled'); if (isAlert) b.classList.add('alert-filled'); else b.classList.remove('alert-filled'); }
+
+// Show option buttons for the current question
+function showOptions(opts) {
+  if (!quickWords) return;
+  quickWords.innerHTML = '';
+  if (!opts || !opts.length) { quickWords.style.display = 'none'; return; }
+  quickWords.style.display = 'flex';
+  opts.forEach(function(opt) {
+    var span = document.createElement('span');
+    span.className = 'quick-word';
+    span.textContent = opt;
+    span.setAttribute('data-word', opt);
+    span.addEventListener('click', function() { handleUserInput(opt); });
+    quickWords.appendChild(span);
+  });
+}
+
+// Option sets for general history questions
+const generalOptions = {
+  pastHistory: ['No major illnesses', 'Diabetes', 'Hypertension', 'Previous surgery', 'Known allergies'],
+  medications: ['No medicines', 'For diabetes', 'For BP', 'For pain', 'Allergic to specific medicine'],
+  familyHistory: ['No family history', 'Diabetes in family', 'Heart disease in family', 'Cancer in family', 'Hypertension in family'],
+  personalHistory: ['No smoking/alcohol', 'Smoker', 'Consumes alcohol', 'Tobacco user', 'Sedentary lifestyle'],
+  ros: ['No other symptoms', 'Breathing difficulty', 'Palpitations', 'Dizziness', 'Sleep problems']
+};
+
+// Update the "My Clinical Summary" formatted section below the chat
+// Render saved visits as block cards in the My Clinical Summary section
+function updateFinalSummary() {
+  var list = document.getElementById('summaryCardsList');
+  if (!list) return;
+  if (!window.patientData || !window.patientData.id) {
+    list.innerHTML = '<div class="doc-empty" style="padding:32px;"><p>Please login to view your saved summaries.</p></div>';
+    return;
+  }
+  var visits = getPatientHistory(window.patientData.id);
+  if (visits.length === 0) {
+    list.innerHTML = '<div class="doc-empty" style="padding:32px;"><div class="doc-empty__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><p>Your saved clinical summaries will appear here. Complete an AI history session and click "Save to ABHA" to create one.</p></div>';
+    return;
+  }
+  var html = '';
+  visits.slice().reverse().forEach(function(v, idx) {
+    var realIdx = visits.length - 1 - idx;
+    var s = v.summary;
+    html += '<div class="doc-patient-card" style="margin-bottom:16px;">';
+    html += '<div class="doc-patient-body" style="padding:20px 28px;">';
+    html += '<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">';
+    html += '<div><h3 style="margin:0 0 4px; font-size:16px; color:var(--primary);">' + (s.chiefComplaint || 'Consultation') + '</h3>';
+    html += '<div class="doc-p-meta">' + v.date + '</div></div>';
+    html += '<button class="btn-sm btn-sm-save" onclick="viewVisit(' + realIdx + ')">View</button>';
+    html += '</div>';
+    if (s.hpi) html += '<p style="margin:10px 0 0; color:var(--muted); font-size:13px;">' + (s.hpi || '').replace(/<br>/g,' ').substring(0,150) + '...</p>';
+    html += '</div></div>';
+  });
+  list.innerHTML = html;
+}
+
+// View a specific visit in the modal
+function viewVisit(idx) {
+  if (!window.patientData) return;
+  var visits = getPatientHistory(window.patientData.id);
+  var v = visits[idx];
+  if (!v) return;
+  var s = v.summary;
+  var modal = document.getElementById('summaryModal');
+  var title = document.getElementById('modalTitle');
+  var content = document.getElementById('modalContent');
+  title.textContent = 'Visit — ' + v.date;
+  var html = '';
+  html += '<div class="doc-section"><div class="doc-section__label">Chief Complaint</div><div class="doc-section__content">' + (s.chiefComplaint || '—') + '</div></div>';
+  if (s.hpi) html += '<div class="doc-section"><div class="doc-section__label">HPI</div><div class="doc-section__content">' + s.hpi.replace(/<br>/g,' ') + '</div></div>';
+  if (s.pastHistory) html += '<div class="doc-section"><div class="doc-section__label">Past Medical History</div><div class="doc-section__content">' + s.pastHistory + '</div></div>';
+  if (s.medications) html += '<div class="doc-section"><div class="doc-section__label doc-section__label--green">Medications & Allergies</div><div class="doc-section__content">' + s.medications + '</div></div>';
+  if (s.familyHistory) html += '<div class="doc-section"><div class="doc-section__label">Family History</div><div class="doc-section__content">' + s.familyHistory + '</div></div>';
+  if (s.personalHistory) html += '<div class="doc-section"><div class="doc-section__label">Personal History</div><div class="doc-section__content">' + s.personalHistory + '</div></div>';
+  if (s.ros) html += '<div class="doc-section"><div class="doc-section__label">Review of Systems</div><div class="doc-section__content">' + s.ros + '</div></div>';
+  if (s.ayush && typeof s.ayush === 'object') {
+    html += '<div class="doc-section"><div class="doc-section__label doc-section__label--amber">Dashavidha Pariksha (Compulsory)</div><div class="doc-section__content"><ul>';
+    for (var k in s.ayush) { html += '<li><strong>' + k + ':</strong> ' + s.ayush[k] + '</li>'; }
+    html += '</ul></div></div>';
+  }
+  if (s.redFlags) html += '<div class="doc-section"><div class="doc-section__label doc-section__label--red">Red-Flag Alert</div><div class="doc-section__content"><span class="doc-tag doc-tag--red">' + s.redFlags + '</span></div></div>';
+  html += '<div class="disclaimer"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>AI-generated summary. For reference only. MediKiosk does not make autonomous diagnoses.</span></div>';
+  content.innerHTML = html;
+  modal.style.display = 'flex';
+}
+
+document.getElementById('closeModalBtn').addEventListener('click', function() {
+  document.getElementById('summaryModal').style.display = 'none';
+});
+document.getElementById('summaryModal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+function collectSummary() {
+  const s = chatState.summaryData;
+  return {
+    chiefComplaint: s.cc || '', hpi: s.hpi || '', pastHistory: s.past || '',
+    medications: s.meds || '', familyHistory: s.fam || '', personalHistory: s.pers || '',
+    ros: s.ros || '', ayush: s.ayush || '', redFlags: s.redflag || ''
+  };
+}
+
+function checkRedFlags(text) {
+  const flags = redFlags.filter(rf => rf.pattern.test(text));
+  if (flags.length > 0) {
+    const ft = flags.map(f => '<strong style="color:var(--red)">' + f.condition + '</strong> — ' + f.detail).join('<br>');
+    setBlock('redflag', ft, true); chatState.summaryData.redflag = flags.map(f => f.condition).join(', ');
+    const banner = document.getElementById('redflagBanner');
+    if (banner) { banner.style.display = 'flex'; document.getElementById('redflagMsg').textContent = flags[0].detail; }
+    addMsg('RED FLAG: ' + flags[0].condition + '. ' + flags[0].detail + ' Staff alerted.', 'alert');
+    return true;
+  }
+  return false;
+}
+
+async function handleUserInput(text) {
+  if (!text || !text.trim()) return;
+  addMsg(text, 'user'); inputEl.value = ''; checkRedFlags(text);
+  var st = chatState;
+  showOptions(null); // hide options while processing
+
+  // STAGE 0: Chief complaint — identify the symptom
+  if (st.stage === 0) {
+    var key = matchSymptom(text);
+    if (key === 'generic pain') {
+      await addAIMsg('I see you have pain. Can you tell me where the pain is? For example: chest, head, stomach, arm, back, joint, or throat?');
+      showOptions(['Chest pain', 'Headache', 'Stomach pain', 'Arm pain', 'Back pain', 'Joint pain', 'Throat pain']);
+      return;
+    }
+    if (key) {
+      st.currentKey = key;
+      st.slotValues = {};
+      setBlock('cc', symptomDefs[key].label);
+      st.summaryData.cc = symptomDefs[key].label;
+      // Try to extract any info from the initial message
+      var extracted = extractSlots(key, text);
+      var found = Object.keys(extracted);
+      if (found.length > 0) {
+        // Merge extracted values
+        for (var k in extracted) st.slotValues[k] = extracted[k];
+        var ack = 'I understand — ' + symptomDefs[key].label + '. I noted: ' + found.map(function(f) { return extracted[f]; }).join(', ') + '. ';
+        var nextSlot = nextUnfilledSlot(key, st.slotValues);
+        if (nextSlot) {
+          await addAIMsg(ack + nextSlot.question);
+          showOptions(nextSlot.opts);
+        } else {
+          await completeSymptom(st);
+        }
+      } else {
+        var nextSlot0 = nextUnfilledSlot(key, st.slotValues);
+        if (nextSlot0) {
+          await addAIMsg('I understand — ' + symptomDefs[key].label + '. ' + nextSlot0.question);
+          showOptions(nextSlot0.opts);
+        } else {
+          await completeSymptom(st);
+        }
+      }
+      st.stage = 1;
+    } else {
+      await addAIMsg('Could you describe your main symptom? For example: chest pain, fever, headache, stomach pain, arm pain, back pain, cough, or weakness?');
+      showOptions(['Chest pain', 'Fever', 'Headache', 'Stomach pain', 'Arm pain', 'Back pain', 'Cough', 'Weakness']);
+    }
+    return;
+  }
+
+  // STAGE 1: Dynamic symptom detail collection
+  if (st.stage === 1) {
+    // Extract any info from the user's answer
+    var extracted2 = extractSlots(st.currentKey, text);
+    var found2 = Object.keys(extracted2);
+    if (found2.length > 0) {
+      for (var k2 in extracted2) st.slotValues[k2] = extracted2[k2];
+      var ack2 = 'Got it — ' + found2.map(function(f) { return extracted2[f]; }).join(', ') + '. ';
+      var nextSlot2 = nextUnfilledSlot(st.currentKey, st.slotValues);
+      if (nextSlot2) {
+        await addAIMsg(ack2 + nextSlot2.question);
+        showOptions(nextSlot2.opts);
+      } else {
+        // All slots filled for this symptom
+        var hpi = buildHPI(st.currentKey, st.slotValues);
+        setBlock('hpi', hpi); st.summaryData.hpi = hpi;
+        setBlock('ros', symptomDefs[st.currentKey].ros); st.summaryData.ros = symptomDefs[st.currentKey].ros;
+        updateFinalSummary();
+        await addAIMsg(ack2 + 'Thank you. Do you have any major past illnesses, surgeries, diabetes, hypertension, or known allergies to medicines?');
+        showOptions(generalOptions.pastHistory);
+        st.stage = 2;
+      }
+    } else {
+      // Couldn't extract anything — acknowledge and ask the next unfilled slot
+      var nextSlot3 = nextUnfilledSlot(st.currentKey, st.slotValues);
+      if (nextSlot3) {
+        await addAIMsg('Thank you for sharing that. ' + nextSlot3.question);
+        showOptions(nextSlot3.opts);
+      } else {
+        var hpi2 = buildHPI(st.currentKey, st.slotValues);
+        setBlock('hpi', hpi2); st.summaryData.hpi = hpi2;
+        setBlock('ros', symptomDefs[st.currentKey].ros); st.summaryData.ros = symptomDefs[st.currentKey].ros;
+        updateFinalSummary();
+        await addAIMsg('Thank you. Do you have any major past illnesses, surgeries, diabetes, hypertension, or known allergies to medicines?');
+        showOptions(generalOptions.pastHistory);
+        st.stage = 2;
+      }
+    }
+    return;
+  }
+
+  // STAGE 2-5: General history questions
+  if (st.stage === 2) {
+    setBlock('past', text); st.summaryData.past = text; updateFinalSummary();
+    await addAIMsg('Noted. Are you currently taking any medicines? And do you have any allergies?');
+    showOptions(generalOptions.medications);
+    st.stage = 3;
+    return;
+  }
+  if (st.stage === 3) {
+    setBlock('meds', text); st.summaryData.meds = text; updateFinalSummary();
+    await addAIMsg('Thank you. Does anyone in your family — parents, siblings — have diabetes, hypertension, heart disease, or cancer?');
+    showOptions(generalOptions.familyHistory);
+    st.stage = 4;
+    return;
+  }
+  if (st.stage === 4) {
+    setBlock('fam', text); st.summaryData.fam = text; updateFinalSummary();
+    await addAIMsg('Got it. Do you smoke, consume alcohol, or use tobacco? How is your diet and physical activity?');
+    showOptions(generalOptions.personalHistory);
+    st.stage = 5;
+    return;
+  }
+  if (st.stage === 5) {
+    setBlock('pers', text); st.summaryData.pers = text; updateFinalSummary();
+    // Dashavidha Pariksha is compulsory — always proceed to AYUSH questions
+    await addAIMsg('Thank you. Now I will ask the 10 Dashavidha Pariksha questions (AYUSH assessment). ' + ayushQuestions[0].question);
+    showOptions(ayushQuestions[0].opts);
+    st.ayushStage = 1; st.stage = 6;
+    return;
+  }
+
+  // STAGE 6: Dashavidha Pariksha (10 compulsory questions)
+  if (st.stage === 6) {
+    var aq = ayushQuestions[st.ayushStage - 1];
+    if (!st.summaryData.ayush) st.summaryData.ayush = {};
+    st.summaryData.ayush[aq.label] = text;
+    setBlock('ayush', Object.entries(st.summaryData.ayush).map(function(e) { return '<strong>' + e[0] + ':</strong> ' + e[1]; }).join('<br>'));
+    updateFinalSummary();
+    if (st.ayushStage < ayushQuestions.length) {
+      var nextQ = ayushQuestions[st.ayushStage];
+      await addAIMsg(nextQ.question);
+      showOptions(nextQ.opts);
+      st.ayushStage++;
+    } else {
+      await addAIMsg('Dashavidha Pariksha complete. A few more questions: Do you have any difficulty breathing, palpitations, dizziness, or sleep problems?');
+      showOptions(generalOptions.ros);
+      st.stage = 7;
+    }
+    return;
+  }
+
+  // STAGE 7: Review of systems
+  if (st.stage === 7) {
+    var existingRos = st.summaryData.ros || '';
+    var newRos = existingRos ? existingRos + ' Additional: ' + text : text;
+    setBlock('ros', newRos); st.summaryData.ros = newRos; updateFinalSummary();
+    if (!blocks.redflag.classList.contains('alert-filled')) setBlock('redflag', 'No urgent red-flag symptoms detected.', false);
+    await addAIMsg('Your clinical summary is ready. Is there anything else you would like to add or any other symptom?');
+    showOptions(['No, that is all', 'Chest pain', 'Fever', 'Headache', 'Stomach pain', 'Arm pain', 'Back pain', 'Cough']);
+    st.stage = 8;
+    return;
+  }
+
+  // STAGE 8: Anything else? — can add a second symptom
+  if (st.stage === 8) {
+    var newKey = matchSymptom(text); var t = text.toLowerCase();
+    if (newKey && newKey !== 'generic pain' && !t.includes('no') && !t.includes('nothing') && !t.includes('that is all') && !t.includes('fine')) {
+      st.currentKey = newKey;
+      st.slotValues = {};
+      // Extract from initial statement
+      var ext = extractSlots(newKey, text);
+      var fnd = Object.keys(ext);
+      if (fnd.length > 0) {
+        for (var fk in ext) st.slotValues[fk] = ext[fk];
+        var ack3 = 'I see — you also have ' + symptomDefs[newKey].label + '. I noted: ' + fnd.map(function(f) { return ext[f]; }).join(', ') + '. ';
+        var ns = nextUnfilledSlot(newKey, st.slotValues);
+        if (ns) { await addAIMsg(ack3 + ns.question); showOptions(ns.opts); }
+        else { await completeSecondSymptom(st); }
+      } else {
+        var ns0 = nextUnfilledSlot(newKey, st.slotValues);
+        if (ns0) { await addAIMsg('I see — you also have ' + symptomDefs[newKey].label + '. ' + ns0.question); showOptions(ns0.opts); }
+        else { await completeSecondSymptom(st); }
+      }
+      st.stage = 9;
+    } else {
+      await addAIMsg('Your summary has been finalized. Click "Save to ABHA" to store it.');
+      showOptions(null);
+      st.stage = 10;
+    }
+    return;
+  }
+
+  // STAGE 9: Second symptom detail collection
+  if (st.stage === 9) {
+    var ext2 = extractSlots(st.currentKey, text);
+    var fnd2 = Object.keys(ext2);
+    if (fnd2.length > 0) {
+      for (var k3 in ext2) st.slotValues[k3] = ext2[k3];
+      var ack4 = 'Noted — ' + fnd2.map(function(f) { return ext2[f]; }).join(', ') + '. ';
+      var ns2 = nextUnfilledSlot(st.currentKey, st.slotValues);
+      if (ns2) {
+        await addAIMsg(ack4 + ns2.question);
+        showOptions(ns2.opts);
+      } else {
+        await completeSecondSymptom(st);
+      }
+    } else {
+      var ns3 = nextUnfilledSlot(st.currentKey, st.slotValues);
+      if (ns3) {
+        await addAIMsg('Thank you for sharing. ' + ns3.question);
+        showOptions(ns3.opts);
+      } else {
+        await completeSecondSymptom(st);
+      }
+    }
+    return;
+  }
+
+  // STAGE 10: Done
+  if (st.stage === 10) {
+    await addAIMsg('Consultation intake complete. Click "Save to ABHA" to store your history. You can also click "New Consultation" to restart.');
+    showOptions(null);
+    return;
+  }
+}
+
+// Helper: complete first symptom, move to general history
+async function completeSymptom(st) {
+  var hpi = buildHPI(st.currentKey, st.slotValues);
+  setBlock('hpi', hpi); st.summaryData.hpi = hpi;
+  setBlock('ros', symptomDefs[st.currentKey].ros); st.summaryData.ros = symptomDefs[st.currentKey].ros;
+  updateFinalSummary();
+  await addAIMsg('Thank you for the details. Do you have any major past illnesses, surgeries, diabetes, hypertension, or known allergies to medicines?');
+  showOptions(generalOptions.pastHistory);
+  st.stage = 2;
+}
+
+// Helper: complete second symptom, go back to "anything else?"
+async function completeSecondSymptom(st) {
+  var addHpi = buildHPI(st.currentKey, st.slotValues);
+  var ex = st.summaryData.hpi || '';
+  setBlock('hpi', ex + '<br>Additionally: ' + addHpi); st.summaryData.hpi = ex + ' ' + addHpi;
+  updateFinalSummary();
+  await addAIMsg('Noted. Added to your summary. Anything else?');
+  showOptions(['No, that is all', 'Chest pain', 'Fever', 'Headache', 'Stomach pain', 'Arm pain', 'Back pain', 'Cough']);
+  st.stage = 8;
+}
+
+sendBtn.addEventListener('click', () => handleUserInput(inputEl.value));
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') handleUserInput(inputEl.value); });
+// Initial symptom options
+showOptions(['Chest pain', 'Fever', 'Headache', 'Stomach pain', 'Arm pain', 'Back pain', 'Cough', 'Weakness']);
+
+// SAVE HISTORY TO ABHA
+async function doSaveToABHA() {
+  if (!window.patientData || !window.patientData.id) {
+    alert('Please login first.');
+    return;
+  }
+
+  const summary = collectSummary();
+
+  if (!summary.chiefComplaint) {
+    alert('No history collected yet. Please complete the AI conversation first.');
+    return;
+  }
+
+  const abhaId = window.patientData.id;
+
+  try {
+    const visit = await savePatientVisit(abhaId, {
+      date: new Date().toLocaleString('en-IN'),
+      patient: window.patientData,
+      summary: summary
+    });
+
+    const d = document.createElement('div');
+    d.className = 'msg msg--saved';
+    d.textContent =
+      'History saved to ABHA ID: ' +
+      abhaId +
+      ' on ' +
+      new Date().toLocaleString('en-IN') +
+      '. You can view it in the My History section.';
+
+    messagesEl.appendChild(d);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    renderMyHistory();
+
+    alert(
+      'History saved to ABHA ID: ' +
+      abhaId +
+      '\n\nYou can view this summary in the "My Clinical Summary" and "My History" sections.'
+    );
+
+  } catch (error) {
+    console.error('Save history error:', error);
+    alert(
+      'Could not save history to Firebase.\n\n' +
+      (error.message || 'Please check your connection and Firestore rules.')
+    );
+  }
+}
+
+document.getElementById('saveHistoryBtn').addEventListener('click', doSaveToABHA);
+
+
+
+
+// RESTART
+document.getElementById('restartBtn').addEventListener('click', function() {
+  messagesEl.innerHTML = '<div class="msg msg--ai">Namaste. Main MediKiosk AI hoon. Aapko kya takleef hai? (Tell me your main problem.)</div>';
+  Object.values(blocks).forEach(b => { if (b) { b.classList.remove('filled', 'alert-filled'); b.querySelector('.summary-block__value').innerHTML = '<span class="placeholder">Pending</span>'; } });
+  blocks.redflag.querySelector('.summary-block__value').innerHTML = '<span class="placeholder">No urgent symptoms detected yet</span>';
+  blocks.cc.querySelector('.summary-block__value').innerHTML = '<span class="placeholder">Waiting for patient input…</span>';
+  blocks.ayush.querySelector('.summary-block__value').innerHTML = '<span class="placeholder">Waiting for Dashavidha Pariksha questions...</span>';
+  const banner = document.getElementById('redflagBanner'); if (banner) banner.style.display = 'none';
+  initChatState();
+  updateFinalSummary();
+  showOptions(['Chest pain', 'Fever', 'Headache', 'Stomach pain', 'Arm pain', 'Back pain', 'Cough', 'Weakness']);
+});
+
+// MIC
+let recording = false;
+micBtn.addEventListener('click', () => {
+  recording = !recording; micBtn.classList.toggle('recording', recording);
+  if (recording) { setTimeout(() => { micBtn.classList.remove('recording'); recording = false; if (chatState.stage === 0) handleUserInput('I have chest pain'); else { inputEl.value = 'since 2 days'; inputEl.focus(); } }, 1800); }
+});
+
+// ===== PAST MEDICAL HISTORY — DOCUMENT UPLOAD + TIMELINE =====
+(function() {
+  var dropZone = document.getElementById('dropZone');
+  var fileInput = document.getElementById('fileInput');
+  var fileList = document.getElementById('fileList');
+  var analyzeBtn = document.getElementById('analyzeBtn');
+  var browseLink = document.getElementById('browseLink');
+  var ocrContent = document.getElementById('ocrContent');
+  var uploadedFiles = [];
+  var docHistory = []; // Array of { name, type, size, date }
+
+  // Medical document keywords — filenames must contain at least one of these
+  var medicalKeywords = ['prescription', 'report', 'lab', 'test', 'discharge', 'summary', 'medical', 'record', 'health', 'diagnosis', 'blood', 'scan', 'xray', 'mri', 'ct', 'ecg', 'echo', 'biopsy', 'rx', 'opd', 'ipd', 'hospital', 'clinic', 'patient', 'lab', 'urine', 'cbc', 'lipid', 'thyroid', 'sugar', 'bp', 'diabetes', 'consultation', 'physician', 'doctor', 'dr', 'report', 'result'];
+
+  function isMedicalFile(filename) {
+    var lower = filename.toLowerCase();
+    // Check if the filename contains any medical keyword
+    for (var i = 0; i < medicalKeywords.length; i++) {
+      if (lower.includes(medicalKeywords[i])) return true;
+    }
+    // Also accept common medical file patterns
+    if (/rx|rx_|presc|lab_|report|discharge|summary|medical|record|health|scan|xray|mri|ct_|ecg|echo|lab|test|report|hospital|clinic|patient|consult|physician|doctor|dr_/i.test(lower)) return true;
+    return false;
+  }
+
+  dropZone.addEventListener('click', function() { fileInput.click(); });
+  browseLink.addEventListener('click', function(e) { e.stopPropagation(); fileInput.click(); });
+  dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('dragover'); });
+  dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+  fileInput.addEventListener('change', function() { handleFiles(fileInput.files); });
+
+  function handleFiles(files) {
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      var lowerName = f.name.toLowerCase();
+      // Check file type (PDF, JPG, PNG only)
+      var validType = lowerName.endsWith('.pdf') || lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg') || lowerName.endsWith('.png');
+      if (!validType) {
+        alert('File "' + f.name + '" is not a valid format. Only PDF, JPG, and PNG files are accepted.');
+        continue;
+      }
+      // Check if filename looks like a medical document
+      if (!isMedicalFile(f.name)) {
+        alert('File "' + f.name + '" does not appear to be a medical document. Only medical documents (prescriptions, lab reports, discharge summaries, medical records) are accepted. Please rename the file to include medical keywords (e.g. "prescription", "lab_report", "discharge_summary").');
+        continue;
+      }
+      uploadedFiles.push(f);
+      renderFile(f);
+    }
+    analyzeBtn.disabled = uploadedFiles.length === 0;
+    // Clear the file input so the same file can be selected again after removal
+    fileInput.value = '';
+  }
+
+  function renderFile(file) {
+    var sz = (file.size / 1024).toFixed(0);
+    var szStr = sz > 1024 ? (sz / 1024).toFixed(1) + ' MB' : sz + ' KB';
+    var item = document.createElement('div');
+    item.className = 'file-item';
+    item.innerHTML = '<div class="file-item__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div class="file-item__info"><div class="file-item__name">' + file.name + '</div><div class="file-item__size">' + szStr + '</div></div><button class="file-item__remove"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>';
+    item.querySelector('.file-item__remove').addEventListener('click', function() {
+      item.remove();
+      uploadedFiles = uploadedFiles.filter(function(f) { return f.name !== file.name; });
+      analyzeBtn.disabled = uploadedFiles.length === 0;
+    });
+    fileList.appendChild(item);
+  }
+
+  analyzeBtn.addEventListener('click', function() {
+    if (uploadedFiles.length === 0) return;
+    // Add each file to the document history
+    uploadedFiles.forEach(function(f) {
+      var sz = (f.size / 1024).toFixed(0);
+      var szStr = sz > 1024 ? (sz / 1024).toFixed(1) + ' MB' : sz + ' KB';
+      // Determine document type from filename
+      var lower = f.name.toLowerCase();
+      var docType = 'Medical Record';
+      if (lower.includes('presc') || lower.includes('rx')) docType = 'Prescription';
+      else if (lower.includes('lab') || lower.includes('test') || lower.includes('blood') || lower.includes('report')) docType = 'Lab Report';
+      else if (lower.includes('discharge')) docType = 'Discharge Summary';
+      else if (lower.includes('scan') || lower.includes('xray') || lower.includes('mri') || lower.includes('ct') || lower.includes('ecg') || lower.includes('echo')) docType = 'Medical Scan';
+
+      docHistory.push({
+        name: f.name,
+        type: docType,
+        size: szStr,
+        date: new Date().toLocaleString('en-IN')
+      });
+    });
+
+    // Clear the upload list
+    uploadedFiles = [];
+    fileList.innerHTML = '';
+    analyzeBtn.disabled = true;
+
+    // Render the timeline
+    renderDocTimeline();
+    alert(docHistory.length + ' document(s) added to your medical history.');
+  });
+
+  function renderDocTimeline() {
+    if (docHistory.length === 0) {
+      ocrContent.innerHTML = '<div class="ocr-empty"><div class="ocr-empty__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><p>Uploaded medical documents will appear here as a timeline.</p></div>';
+      return;
+    }
+    var html = '<div style="margin-bottom:12px; font-size:13px; color:var(--muted);">' + docHistory.length + ' document(s) uploaded</div>';
+    html += '<div class="timeline">';
+    docHistory.slice().reverse().forEach(function(doc) {
+      var typeColor = doc.type === 'Prescription' ? 'var(--green)' : doc.type === 'Lab Report' ? 'var(--accent)' : doc.type === 'Discharge Summary' ? 'var(--amber)' : 'var(--muted)';
+      html += '<div class="timeline-item">';
+      html += '<div class="timeline-item__date">' + doc.date + '</div>';
+      html += '<div class="timeline-item__card">';
+      html += '<div class="timeline-item__cc" style="color:' + typeColor + '; font-size:12px; font-weight:600; text-transform:uppercase; margin-bottom:4px;">' + doc.type + '</div>';
+      html += '<div style="font-weight:600; font-size:14px; color:var(--primary); margin-bottom:2px;">' + doc.name + '</div>';
+      html += '<div class="timeline-item__detail">' + doc.size + '</div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+    ocrContent.innerHTML = html;
+  }
+})();
+
+// ===== RED FLAG DEMO =====
+(function() {
+  const redflagResults = document.getElementById('redflagResults');
+  const flagData = {
+    chest: { banner: 'Chest pain radiating to left arm with sweating. Staff alerted. Priority queue.', results: [{ l: 'urgent', t: 'Chest pain radiating to left arm', d: 'Radiation pattern suggests cardiac origin. Immediate ECG recommended.' }, { l: 'urgent', t: 'Diaphoresis (sweating)', d: 'Sweating with chest pain — warning sign of ACS.' }] },
+    stroke: { banner: 'FAST positive. Staff alerted immediately.', results: [{ l: 'urgent', t: 'FAST positive — facial droop', d: 'Stroke protocol activated. Time-critical.' }, { l: 'urgent', t: 'Slurred speech + arm weakness', d: 'Immediate CT brain required.' }] },
+    breath: { banner: 'Severe respiratory distress with cyanosis. Staff alerted.', results: [{ l: 'urgent', t: 'Severe respiratory distress', d: 'Labored breathing — possible pulmonary edema.' }, { l: 'urgent', t: 'Possible cyanosis', d: 'Hypoxia — immediate O2 and ABG required.' }] },
+    bleed: { banner: 'GI bleed. Staff alerted. IV access initiated.', results: [{ l: 'urgent', t: 'Hematemesis', d: 'Upper GI bleed — urgent endoscopy may be needed.' }, { l: 'urgent', t: 'Melena', d: 'Dark stools confirm GI bleed.' }] }
+  };
+  document.querySelectorAll('[data-rf]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const key = btn.dataset.rf;
+      if (key === 'reset') { document.getElementById('redflagBanner').style.display = 'none'; redflagResults.innerHTML = '<div class="ocr-empty"><div class="ocr-empty__icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.39 0 4.68.94 6.36 2.64"/></svg></div><p>Tap a symptom to simulate red-flag detection.</p></div>'; return; }
+      const data = flagData[key]; if (!data) return;
+      document.getElementById('redflagBanner').style.display = 'flex'; document.getElementById('redflagMsg').textContent = data.banner;
+      let html = '';
+      data.results.forEach(r => { html += '<div class="redflag-card ' + (r.l === 'urgent' ? 'redflag-card--urgent' : '') + '"><div class="redflag-card__header"><span class="redflag-card__level ' + (r.l === 'urgent' ? 'redflag-card__level--urgent' : 'redflag-card__level--moderate') + '">' + (r.l === 'urgent' ? 'URGENT' : 'MODERATE') + '</span><span class="redflag-card__title">' + r.t + '</span></div><div class="redflag-card__detail">' + r.d + '</div></div>'; });
+      redflagResults.innerHTML = html;
+      const rfBlock = document.getElementById('block-redflag');
+      if (rfBlock) { rfBlock.querySelector('.summary-block__value').innerHTML = '<strong style="color:var(--red)">' + data.results[0].t + '</strong> — ' + data.results[0].d; rfBlock.classList.add('filled', 'alert-filled'); }
+    });
+  });
+})();
+
+// ===== MY VISIT HISTORY (patient view) =====
+async function renderMyHistory() {
+  var list = document.getElementById('myHistoryList');
+  if (!list) return;
+
+  if (window.patientData && window.patientData.id) {
+    await loadPatientHistory(window.patientData.id);
+  }
+  if (!window.patientData || !window.patientData.id) {
+    list.innerHTML = '<div class="doc-empty" style="padding:32px;"><div class="doc-empty__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15h8M9 9h.01M15 9h.01"/></svg></div><h3>Please login</h3><p>Login to view your saved consultation history.</p></div>';
+    return;
+  }
+  var visits = getPatientHistory(window.patientData.id);
+  if (visits.length === 0) {
+    list.innerHTML = '<div class="doc-empty" style="padding:40px;"><div class="doc-empty__icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div><h3>No consultations yet</h3><p>You have no saved MediKiosk consultations. Complete an AI history session above and click "Save to ABHA" to store your history.</p></div>';
+    return;
+  }
+  var html = '';
+  visits.slice().reverse().forEach(function(v, idx) {
+    var realIdx = visits.length - 1 - idx;
+    var s = v.summary;
+    html += '<div class="doc-patient-card" style="margin-bottom:20px;">';
+    html += '<div class="doc-patient-header">';
+    html += '<div class="doc-p-info"><div class="doc-p-avatar">' + (window.patientData.name||'P').split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase() + '</div>';
+    html += '<div><h3 style="margin:0;">Visit — ' + v.date + '</h3>';
+    html += '<div class="doc-p-meta">ABHA: ' + window.patientData.id + ' | ' + (window.patientData.gender||'—') + ', ' + (window.patientData.age||'—') + ' yrs';
+    
+    html += '</div></div>';
+    html += '</div></div>';
+    html += '<div class="doc-patient-body">';
+    html += '<div class="doc-section"><div class="doc-section__label">Chief Complaint</div><div class="doc-section__content">' + (s.chiefComplaint||'—') + '</div></div>';
+    if (s.hpi) html += '<div class="doc-section"><div class="doc-section__label">HPI</div><div class="doc-section__content">' + s.hpi.replace(/<br>/g,' ') + '</div></div>';
+    if (s.pastHistory) html += '<div class="doc-section"><div class="doc-section__label">Past Medical History</div><div class="doc-section__content">' + s.pastHistory + '</div></div>';
+    if (s.medications) html += '<div class="doc-section"><div class="doc-section__label doc-section__label--green">Medications & Allergies</div><div class="doc-section__content">' + s.medications + '</div></div>';
+    if (s.familyHistory) html += '<div class="doc-section"><div class="doc-section__label">Family History</div><div class="doc-section__content">' + s.familyHistory + '</div></div>';
+    if (s.personalHistory) html += '<div class="doc-section"><div class="doc-section__label">Personal History</div><div class="doc-section__content">' + s.personalHistory + '</div></div>';
+    if (s.ros) html += '<div class="doc-section"><div class="doc-section__label">Review of Systems</div><div class="doc-section__content">' + s.ros + '</div></div>';
+    if (s.ayush && typeof s.ayush === 'object') {
+      html += '<div class="doc-section"><div class="doc-section__label doc-section__label--amber">Dashavidha Pariksha (Compulsory)</div><div class="doc-section__content"><ul>';
+      for (var k in s.ayush) { html += '<li><strong>' + k + ':</strong> ' + s.ayush[k] + '</li>'; }
+      html += '</ul></div></div>';
+    }
+    if (s.redFlags) html += '<div class="doc-section"><div class="doc-section__label doc-section__label--red">Red-Flag Alert</div><div class="doc-section__content"><span class="doc-tag doc-tag--red">' + s.redFlags + '</span></div></div>';
+    html += '<div class="disclaimer"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>AI-generated summary. For reference only. MediKiosk does not make autonomous diagnoses.</span></div>';
+    html += '</div></div>';
+  });
+  list.innerHTML = html;
+}
+document.getElementById('refreshHistoryBtn').addEventListener('click', renderMyHistory);
+document.getElementById('navMyHistory').addEventListener('click', function(e) { e.preventDefault(); renderMyHistory(); document.getElementById('myHistory').scrollIntoView({behavior:'smooth'}); });
+</script>
+</body>
+</html>
+
+<script>window.viewVisit = window.viewVisit || function(){};</script>
