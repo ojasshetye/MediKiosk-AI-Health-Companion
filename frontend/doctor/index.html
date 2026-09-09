@@ -339,7 +339,7 @@ async function loadPatientFromBackend(abhaId) {
   const idToken = await user.getIdToken();
 
   const response = await fetch(
-    "http://localhost:3000/api/doctor/patient/" +
+    "https://medikiosk-ai-backend.onrender.com/api/doctor/patient/" +
       encodeURIComponent(abhaId),
     {
       method: "GET",
@@ -417,7 +417,7 @@ loginForm.addEventListener('submit', async function(e) {
     clearAuthMsgs();
 
     const response = await fetch(
-      'http://localhost:3000/api/doctor/login',
+      'https://medikiosk-ai-backend.onrender.com/api/doctor/login',
       {
         method: 'POST',
         headers: {
@@ -484,7 +484,7 @@ signupForm.addEventListener('submit', async function(e) {
     clearAuthMsgs();
 
     const response = await fetch(
-      'http://localhost:3000/api/doctor/signup',
+      'https://medikiosk-ai-backend.onrender.com/api/doctor/signup',
       {
         method: 'POST',
         headers: {
