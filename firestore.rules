@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /patients/{abhaId} {
+
+      allow read, create, update: if request.auth != null
+        && request.auth.token.role == "patient"
+        && request.auth.token.abhaId == abhaId;
+
+      match /visits/{visitId} {
+
+        allow read, create, update: if request.auth != null
+          && request.auth.token.role == "patient"
+          && request.auth.token.abhaId == abhaId;
+      }
+    }
+
+    match /doctors/{doctorId} {
+
+      allow read: if request.auth != null
+        && request.auth.token.role == "doctor"
+        && request.auth.token.doctorId == doctorId;
+    }
+  }
+}
